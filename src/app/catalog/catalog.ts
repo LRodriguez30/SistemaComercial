@@ -8,9 +8,9 @@ import { AfterViewInit, Component, computed, CUSTOM_ELEMENTS_SCHEMA, signal } fr
 export class Catalog implements AfterViewInit {
     ngOnInit(): void {
         setTimeout(() => {
-        document.querySelectorAll('.reveal').forEach(el => {
-            el.classList.add('active');
-        });
+            document.querySelectorAll('.reveal').forEach(el => {
+                el.classList.add('active');
+            });
         }, 50);
     }
 
@@ -108,6 +108,7 @@ export class Catalog implements AfterViewInit {
     selectProduct(product: any) {
         this.selectedProduct.set(product);
         this.selectedSize.set(null);
+        this.lockScroll();
         this.state.set('open');
     }
 
@@ -116,7 +117,16 @@ export class Catalog implements AfterViewInit {
 
         setTimeout(() => {
             this.state.set('closed');
+            this.unlockScroll();
             this.selectedProduct.set(null);
         }, 200);
+    }
+
+    lockScroll() {
+        document.documentElement.style.overflow = 'hidden';
+    }
+
+    unlockScroll() {
+        document.documentElement.style.overflow = '';
     }
 }
