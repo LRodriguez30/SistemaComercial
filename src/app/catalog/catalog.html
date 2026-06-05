@@ -8,76 +8,74 @@
     </div>
 
     <!-- MODAL -->
-<div class="relative bg-white w-full max-w-5xl mx-4 rounded-[2rem] shadow-2xl overflow-hidden
-       transition-all duration-200 ease-out animate-modalIn"
-    [class.opacity-0]="isClosing()"
-    [class.scale-95]="isClosing()">
+    <div class="relative bg-white w-full max-w-5xl mx-4 max-h-[75vh] overflow-y-auto rounded-[2rem] shadow-2xl overflow-hidden
+           transition-all duration-200 ease-out animate-modalIn" [class.opacity-0]="isClosing()"
+        [class.scale-95]="isClosing()">
 
-    <section class="grid grid-cols-1 lg:grid-cols-2 max-h-[90vh] lg:max-h-none overflow-y-auto lg:overflow-visible">
+        <section class="grid grid-cols-1 lg:grid-cols-2">
 
-        <!-- IMAGE -->
-        <div class="bg-zinc-100 lg:sticky lg:top-0">
-            <img [src]="selectedProduct().image"
-                 class="w-full aspect-square object-cover max-h-[40vh] lg:max-h-none" />
-        </div>
-
-        <!-- INFO -->
-        <div class="p-8 lg:p-10 relative">
-
-            <!-- CLOSE -->
-            <button (click)="closeDetail()" class="absolute top-5 right-5 w-10 h-10 rounded-full
-             flex items-center justify-center
-             text-zinc-500 hover:text-black hover:bg-zinc-100
-             transition cursor-pointer active:scale-95">
-                ✕
-            </button>
-
-            <h2 class="text-3xl lg:text-4xl font-black pr-10">
-                {{ selectedProduct().name }}
-            </h2>
-
-            <p class="text-zinc-600 mt-4 leading-relaxed">
-                {{ selectedProduct().description }}
-            </p>
-
-            <!-- TAGS -->
-            <div class="flex flex-wrap gap-2 mt-5">
-                @for (t of selectedProduct().tags; track t) {
-                <span class="text-xs px-3 py-1 rounded-full bg-zinc-100 border text-zinc-600">
-                    {{ t }}
-                </span>
-                }
+            <!-- IMAGE -->
+            <div class="bg-zinc-100">
+                <img [src]="selectedProduct().image" class="w-full aspect-square object-cover" />
             </div>
 
-            <div class="flex flex-wrap gap-2 mt-4">
-                @for (s of sizes; track s) {
-                <button type="button" (click)="selectSize(s)"
-                    class="px-3 py-1 rounded-full border text-sm transition cursor-pointer active:scale-95"
-                    [class.bg-black]="selectedSize() === s" [class.text-white]="selectedSize() === s"
-                    [class.border-black]="selectedSize() === s" [class.border-zinc-300]="selectedSize() !== s"
-                    [class.hover:bg-zinc-100]="selectedSize() !== s">
-                    {{ s }}
+            <!-- INFO -->
+            <div class="p-8 lg:p-10 relative">
+
+                <!-- CLOSE -->
+                <button (click)="closeDetail()" class="absolute top-5 right-5 w-10 h-10 rounded-full
+                 flex items-center justify-center
+                 text-zinc-500 hover:text-black hover:bg-zinc-100
+                 transition cursor-pointer active:scale-95">
+                    ✕
                 </button>
-                }
+
+                <h2 class="text-4xl font-black">
+                    {{ selectedProduct().name }}
+                </h2>
+
+                <p class="text-zinc-600 mt-4 leading-relaxed">
+                    {{ selectedProduct().description }}
+                </p>
+
+                <!-- TAGS -->
+                <div class="flex flex-wrap gap-2 mt-5">
+                    @for (t of selectedProduct().tags; track t) {
+                    <span class="text-xs px-3 py-1 rounded-full bg-zinc-100 border text-zinc-600">
+                        {{ t }}
+                    </span>
+                    }
+                </div>
+
+                <div class="flex flex-wrap gap-2 mt-4">
+                    @for (s of sizes; track s) {
+                    <button type="button" (click)="selectSize(s)"
+                        class="px-3 py-1 rounded-full border text-sm transition cursor-pointer active:scale-95"
+                        [class.bg-black]="selectedSize() === s" [class.text-white]="selectedSize() === s"
+                        [class.border-black]="selectedSize() === s" [class.border-zinc-300]="selectedSize() !== s"
+                        [class.hover:bg-zinc-100]="selectedSize() !== s">
+                        {{ s }}
+                    </button>
+                    }
+                </div>
+
+                <!-- PRICE -->
+                <div class="mt-8 text-2xl font-black">
+                    {{ selectedProduct().price }} C$
+                </div>
+
+                <button [disabled]="!selectedSize()" class="mt-8 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-black text-white
+         transition active:scale-95 cursor-pointer
+         hover:bg-zinc-800
+         disabled:bg-zinc-300 disabled:cursor-not-allowed disabled:active:scale-100">
+                    Solicitar pedido
+                </button>
+
             </div>
 
-            <!-- PRICE -->
-            <div class="mt-8 text-2xl font-black">
-                {{ selectedProduct().price }} C$
-            </div>
+        </section>
 
-            <button [disabled]="!selectedSize()" class="mt-4 mb-2 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-black text-white
-     transition active:scale-95 cursor-pointer
-     hover:bg-zinc-800
-     disabled:bg-zinc-300 disabled:cursor-not-allowed disabled:active:scale-100">
-                Solicitar pedido
-            </button>
-
-        </div>
-
-    </section>
-
-</div>
+    </div>
 
 </div>
 
