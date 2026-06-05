@@ -1,3 +1,51 @@
 /* You can add global styles to this file, and also import other style files */
 
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 @import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.5s; }
+.reveal-delay-3 { transition-delay: 1s; }
+.reveal-delay-4 { transition-delay: 0.6s; }
+
+.reveal-card {
+  opacity: 0;
+  transform: translateY(25px) scale(0.98);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+  will-change: transform, opacity;
+}
+
+.reveal-card.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: cardIn 0.4s ease-out both;
+}
+
+.reveal-card.delay-1 { transition-delay: 0.1s; }
+.reveal-card.delay-2 { transition-delay: 0.2s; }
+.reveal-card.delay-3 { transition-delay: 0.3s; }
+.reveal-card.delay-4 { transition-delay: 0.4s; }
+
+.parallax {
+  will-change: transform;
+  transition: transform 0.1s linear;
+}
