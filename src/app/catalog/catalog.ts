@@ -6,6 +6,14 @@ import { AfterViewInit, Component, computed, CUSTOM_ELEMENTS_SCHEMA, signal } fr
     templateUrl: './catalog.html'
 })
 export class Catalog implements AfterViewInit {
+    ngOnInit(): void {
+        setTimeout(() => {
+        document.querySelectorAll('.reveal').forEach(el => {
+            el.classList.add('active');
+        });
+        }, 50);
+    }
+
     ngAfterViewInit(): void {
 
         const reveals = document.querySelectorAll('.reveal, .reveal-card');

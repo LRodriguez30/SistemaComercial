@@ -6,98 +6,101 @@
     <div class="max-w-7xl mx-auto px-6 lg:px-12 py-5 flex items-center justify-between">
 
       <!-- LOGO -->
-      <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
 
-        <!-- TEXTO -->
         <div>
-          <h1 class="text-2xl font-black tracking-[0.35em]">
-            PASOS
-          </h1>
-
-          <p class="text-xs text-zinc-500 mt-1">
-            Grupo Chang Xing S.A.
-          </p>
+          <h1 class="text-2xl font-black tracking-[0.35em]">PASOS</h1>
+          <p class="text-xs text-zinc-500 mt-1">Grupo Chang Xing S.A.</p>
         </div>
 
-        <!-- LOGO -->
-        <a routerLink="/" class="inline-flex items-center transition-all duration-200 ease-out
-          active:scale-95 active:opacity-80 cursor-pointer">
-
+        <a routerLink="/" class="inline-flex items-center transition-all duration-200 ease-out active:scale-95 active:opacity-80 cursor-pointer">
           <img src="Marca Pasos Ico.svg" alt="PASOS logo" class="h-10 w-auto object-contain" />
-
         </a>
 
       </div>
 
-      <!-- NAV -->
+      <!-- NAV desktop -->
       <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-600">
 
-        <a routerLink="/" class="group flex items-center gap-2 text-zinc-600 hover:text-black 
-          transition-all duration-200 ease-out 
-          active:scale-95 cursor-pointer">
-
-          <iconify-icon icon="lucide:home"
-            class="w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110">
-          </iconify-icon>
-
-          <span class="relative">
-            Inicio
-            <span
-              class="absolute left-0 -bottom-1 h-[1px] w-0 bg-black transition-all duration-300 group-hover:w-full"></span>
-          </span>
-
+        <a routerLink="/" class="group flex items-center gap-2 text-zinc-600 hover:text-black transition-all duration-200 ease-out active:scale-95 cursor-pointer">
+          <iconify-icon icon="lucide:home" class="w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110"></iconify-icon>
+          <span class="relative">Inicio<span class="absolute left-0 -bottom-1 h-[1px] w-0 bg-black transition-all duration-300 group-hover:w-full"></span></span>
         </a>
 
-        <a routerLink="/catalog" class="group flex items-center gap-2 text-zinc-600 hover:text-black 
-          transition-all duration-200 ease-out 
-          active:scale-95 cursor-pointer">
-
-          <iconify-icon icon="lucide:footprints"
-            class="w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110">
-          </iconify-icon>
-
-          <span class="relative">
-            Catálogo
-            <span
-              class="absolute left-0 -bottom-1 h-[1px] w-0 bg-black transition-all duration-300 group-hover:w-full"></span>
-          </span>
-
+        <a routerLink="/catalog" class="group flex items-center gap-2 text-zinc-600 hover:text-black transition-all duration-200 ease-out active:scale-95 cursor-pointer">
+          <iconify-icon icon="lucide:footprints" class="w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110"></iconify-icon>
+          <span class="relative">Catálogo<span class="absolute left-0 -bottom-1 h-[1px] w-0 bg-black transition-all duration-300 group-hover:w-full"></span></span>
         </a>
 
-        <a routerLink="/branch" class="group flex items-center gap-2 text-zinc-600 hover:text-black 
-          transition-all duration-200 ease-out 
-          active:scale-95 cursor-pointer">
-
-          <iconify-icon icon="lucide:map-pin"
-            class="w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110">
-          </iconify-icon>
-
-          <span class="relative">
-            Puntos de venta
-            <span
-              class="absolute left-0 -bottom-1 h-[1px] w-0 bg-black transition-all duration-300 group-hover:w-full"></span>
-          </span>
-
+        <a routerLink="/branch" class="group flex items-center gap-2 text-zinc-600 hover:text-black transition-all duration-200 ease-out active:scale-95 cursor-pointer">
+          <iconify-icon icon="lucide:map-pin" class="w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110"></iconify-icon>
+          <span class="relative">Puntos de venta<span class="absolute left-0 -bottom-1 h-[1px] w-0 bg-black transition-all duration-300 group-hover:w-full"></span></span>
         </a>
 
-        <a routerLink="/about" class="group flex items-center gap-2 text-zinc-600 hover:text-black 
-          transition-all duration-200 ease-out 
-          active:scale-95 cursor-pointer">
-
-          <iconify-icon icon="lucide:building-2"
-            class="w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110">
-          </iconify-icon>
-
-          <span class="relative">
-            Acerca de Nosotros
-            <span class="absolute left-0 -bottom-1 h-[1px] w-0 bg-black transition-all duration-300 group-hover:w-full">
-            </span>
-          </span>
-
+        <a routerLink="/about" class="group flex items-center gap-2 text-zinc-600 hover:text-black transition-all duration-200 ease-out active:scale-95 cursor-pointer">
+          <iconify-icon icon="lucide:building-2" class="w-[18px] h-[18px] transition-transform duration-200 group-hover:scale-110"></iconify-icon>
+          <span class="relative">Acerca de Nosotros<span class="absolute left-0 -bottom-1 h-[1px] w-0 bg-black transition-all duration-300 group-hover:w-full"></span></span>
         </a>
 
       </nav>
 
+      <!-- BOTÓN HAMBURGUESA (solo mobile) -->
+      <button
+        (click)="toggleMenu()"
+        class="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-[5px] rounded-md
+               hover:bg-zinc-100 transition-colors duration-200 active:scale-95"
+        aria-label="Abrir menú">
+        <span class="block w-5 h-[1.5px] bg-black transition-all duration-300"
+              [class.rotate-45]="isMenuOpen()"
+              [class.translate-y-[6.5px]]="isMenuOpen()"></span>
+        <span class="block w-5 h-[1.5px] bg-black transition-all duration-300"
+              [class.opacity-0]="isMenuOpen()"></span>
+        <span class="block w-5 h-[1.5px] bg-black transition-all duration-300"
+              [class.-rotate-45]="isMenuOpen()"
+              [class.-translate-y-[6.5px]]="isMenuOpen()"></span>
+      </button>
+
+    </div>
+
+    <!-- MENÚ MOBILE -->
+    <div
+      class="md:hidden overflow-hidden transition-all duration-300 ease-in-out"
+      [class.max-h-0]="!isMenuOpen()"
+      [class.max-h-96]="isMenuOpen()"
+      [class.border-t]="isMenuOpen()"
+      [class.border-zinc-100]="isMenuOpen()">
+
+      <nav class="flex flex-col px-6 py-4 gap-1">
+
+        <a routerLink="/" (click)="closeMenu()"
+           class="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-zinc-600
+                  hover:text-black hover:bg-zinc-50 transition-all duration-200 active:scale-[0.98]">
+          <iconify-icon icon="lucide:home" class="w-[18px] h-[18px] shrink-0"></iconify-icon>
+          Inicio
+        </a>
+
+        <a routerLink="/catalog" (click)="closeMenu()"
+           class="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-zinc-600
+                  hover:text-black hover:bg-zinc-50 transition-all duration-200 active:scale-[0.98]">
+          <iconify-icon icon="lucide:footprints" class="w-[18px] h-[18px] shrink-0"></iconify-icon>
+          Catálogo
+        </a>
+
+        <a routerLink="/branch" (click)="closeMenu()"
+           class="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-zinc-600
+                  hover:text-black hover:bg-zinc-50 transition-all duration-200 active:scale-[0.98]">
+          <iconify-icon icon="lucide:map-pin" class="w-[18px] h-[18px] shrink-0"></iconify-icon>
+          Puntos de venta
+        </a>
+
+        <a routerLink="/about" (click)="closeMenu()"
+           class="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-zinc-600
+                  hover:text-black hover:bg-zinc-50 transition-all duration-200 active:scale-[0.98]">
+          <iconify-icon icon="lucide:building-2" class="w-[18px] h-[18px] shrink-0"></iconify-icon>
+          Acerca de Nosotros
+        </a>
+
+      </nav>
     </div>
 
   </header>
@@ -106,41 +109,28 @@
 
   <!-- FOOTER -->
   <footer class="border-t border-zinc-200">
-
     <div class="max-w-7xl mx-auto px-6 lg:px-12 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
 
-      <p class="text-sm text-zinc-500">
-        © 2026 PASOS — Grupo Chang Xing S.A.
-      </p>
+      <p class="text-sm text-zinc-500">© 2026 PASOS — Grupo Chang Xing S.A.</p>
 
       <div class="flex items-center gap-6 text-sm text-zinc-500">
 
-        <a class="flex items-center gap-2 text-zinc-600 hover:text-black 
-          transition-all duration-200 ease-out cursor-pointer 
-          active:scale-95 active:translate-y-[1px]">
-
-          <svg class="w-4 h-4 transition-transform duration-200 group-active:scale-90" fill="currentColor"
-            viewBox="0 0 24 24">
+        <a class="flex items-center gap-2 text-zinc-600 hover:text-black transition-all duration-200 ease-out cursor-pointer active:scale-95 active:translate-y-[1px]">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
           </svg>
-
           Facebook
         </a>
 
-        <a class="flex items-center gap-2 text-zinc-600 hover:text-black 
-          transition-all duration-200 ease-out cursor-pointer 
-          active:scale-95 active:translate-y-[1px]">
-          <svg class="w-4 h-4 transition-transform duration-200 group-active:scale-90" fill="currentColor"
-            viewBox="0 0 24 24">
+        <a class="flex items-center gap-2 text-zinc-600 hover:text-black transition-all duration-200 ease-out cursor-pointer active:scale-95 active:translate-y-[1px]">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M20 2H4a2 2 0 00-2 2v16l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z" />
           </svg>
           WhatsApp
         </a>
 
       </div>
-
     </div>
-
   </footer>
 
 </main>
