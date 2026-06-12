@@ -16,7 +16,7 @@
 
             <!-- IMAGE -->
             <div class="bg-zinc-100">
-                <img [src]="selectedProduct().image" class="w-full aspect-square object-cover" />
+                <img [src]="selectedProduct()?.image" class="w-full aspect-square object-cover" />
             </div>
 
             <!-- INFO -->
@@ -31,28 +31,29 @@
                 </button>
 
                 <h2 class="text-4xl font-black">
-                    {{ selectedProduct().name }}
+                    {{ selectedProduct()?.name }}
                 </h2>
 
                 <p class="text-zinc-600 mt-4 leading-relaxed">
-                    {{ selectedProduct().description }}
+                    {{ selectedProduct()?.description }}
                 </p>
 
                 <!-- TAGS -->
                 <div class="flex flex-wrap gap-2 mt-5">
-                    @for (t of selectedProduct().tags; track t) {
+                    @for (t of selectedProduct()?.tags; track t) {
                     <span class="text-xs px-3 py-1 rounded-full bg-zinc-100 border text-zinc-600">
                         {{ t }}
                     </span>
                     }
                 </div>
 
-                <div class="flex flex-wrap gap-2 mt-4">
+                <div class="flex flex-wrap gap-2 mt-5">
                     @for (s of sizes; track s) {
                     <button type="button" (click)="selectSize(s)"
-                        class="px-3 py-1 rounded-full border text-sm transition cursor-pointer active:scale-95"
+                        class="w-11 h-11 rounded-2xl border text-sm font-black transition cursor-pointer active:scale-95"
                         [class.bg-black]="selectedSize() === s" [class.text-white]="selectedSize() === s"
-                        [class.border-black]="selectedSize() === s" [class.border-zinc-300]="selectedSize() !== s"
+                        [class.border-black]="selectedSize() === s" [class.bg-white]="selectedSize() !== s"
+                        [class.text-zinc-700]="selectedSize() !== s" [class.border-zinc-200]="selectedSize() !== s"
                         [class.hover:bg-zinc-100]="selectedSize() !== s">
                         {{ s }}
                     </button>
@@ -61,14 +62,14 @@
 
                 <!-- PRICE -->
                 <div class="mt-8 text-2xl font-black">
-                    {{ selectedProduct().price }} C$
+                    {{ selectedProduct()?.price }} C$
                 </div>
 
-                <button [disabled]="!selectedSize()" class="mt-8 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-black text-white
-         transition active:scale-95 cursor-pointer
-         hover:bg-zinc-800
-         disabled:bg-zinc-300 disabled:cursor-not-allowed disabled:active:scale-100">
-                    Solicitar pedido
+                <button (click)="addToCart()" [disabled]="!selectedSize()" class="mt-8 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-black text-white
+    transition active:scale-95 cursor-pointer
+    hover:bg-zinc-800
+    disabled:bg-zinc-300 disabled:cursor-not-allowed disabled:active:scale-100">
+                    Agregar al carrito
                 </button>
 
             </div>
@@ -80,6 +81,549 @@
 </div>
 
 }
+
+@if (cartOpen()) {
+<div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-md cursor-pointer animate-fadeIn" (click)="closeCart()">
+    </div>
+
+    <div class="relative bg-white w-full sm:max-w-3xl sm:mx-4
+    h-[88vh] sm:h-auto sm:max-h-[82vh]
+    rounded-t-[2rem] sm:rounded-[2rem]
+    shadow-[0_25px_80px_rgba(0,0,0,0.35)]
+    overflow-hidden animate-modalIn flex flex-col">
+        <div class="p-5 sm:p-8 overflow-y-auto custom-scrollbar">
+
+            <button (click)="closeCart()" class="absolute top-5 right-5 w-10 h-10 rounded-full
+            flex items-center justify-center
+            bg-zinc-100 text-zinc-500
+            hover:bg-black hover:text-white
+            transition cursor-pointer active:scale-95">
+                ✕
+            </button>
+
+            <div class="pr-12">
+                <span class="text-xs uppercase tracking-[0.2em] text-zinc-500 font-bold">
+                    Resumen
+                </span>
+
+                <h2 class="text-3xl sm:text-4xl font-black mt-2">
+                    Carrito
+                </h2>
+
+                <p class="text-sm text-zinc-500 mt-2">
+                    Revisa tus productos antes de solicitar el pedido.
+                </p>
+            </div>
+
+            @if (cart().length === 0) {
+
+            <div class="mt-10 border border-dashed border-zinc-300 rounded-[1.5rem] p-8 text-center">
+                <div class="w-14 h-14 mx-auto rounded-full bg-zinc-100 flex items-center justify-center">
+                    <iconify-icon icon="mdi:cart-outline" class="text-3xl text-zinc-500"></iconify-icon>
+                </div>
+
+                <p class="font-black mt-4">
+                    Tu carrito está vacío
+                </p>
+
+                <p class="text-sm text-zinc-500 mt-2">
+                    Agrega un modelo desde el catálogo para verlo aquí.
+                </p>
+            </div>
+
+            } @else {
+
+            <div class="mt-8 space-y-4">
+
+                @for (item of cart(); track item.product.id + '-' + item.size; let i = $index) {
+
+                <div class="group rounded-[1.5rem] border border-zinc-200 bg-white
+                shadow-sm hover:shadow-lg transition-all duration-300
+                p-4 sm:p-5">
+
+                    <div class="flex gap-4">
+
+                        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-zinc-100 overflow-hidden shrink-0">
+                            <img [src]="item.product.image"
+                                class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <h3 class="font-black text-lg leading-tight">
+                                        {{ item.product.name }}
+                                    </h3>
+
+                                    <p class="text-xs sm:text-sm text-zinc-500 mt-1">
+                                        Talla {{ item.size }}
+                                    </p>
+                                </div>
+
+                                <button (click)="removeFromCart(i)" class="w-9 h-9 rounded-full bg-zinc-100 text-zinc-500
+                                hover:bg-black hover:text-white transition cursor-pointer shrink-0">
+                                    <iconify-icon icon="mdi:trash-can-outline" class="text-lg"></iconify-icon>
+                                </button>
+                            </div>
+
+                            <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+                                <div
+                                    class="inline-flex items-center w-fit rounded-full border border-zinc-200 bg-zinc-50 p-1">
+
+                                    <button (click)="decreaseQuantity(i)" class="w-8 h-8 rounded-full bg-white border border-zinc-200
+                                    hover:bg-black hover:text-white transition cursor-pointer">
+                                        -
+                                    </button>
+
+                                    <span class="w-10 text-center text-sm font-black">
+                                        {{ item.quantity }}
+                                    </span>
+
+                                    <button (click)="increaseQuantity(i)" class="w-8 h-8 rounded-full bg-white border border-zinc-200
+                                    hover:bg-black hover:text-white transition cursor-pointer">
+                                        +
+                                    </button>
+
+                                </div>
+
+                                <div class="sm:text-right">
+                                    <p class="text-xs text-zinc-500">
+                                        Subtotal
+                                    </p>
+
+                                    <p class="font-black text-lg">
+                                        {{ item.product.price * item.quantity }} C$
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                }
+
+            </div>
+
+            <div class="sticky bottom-0 -mx-5 sm:-mx-8 mt-8 border-t border-zinc-200
+    bg-white/95 backdrop-blur px-5 sm:px-8 pt-5 pb-1">
+
+                <div class="space-y-3">
+
+                    <div class="flex justify-between items-center text-sm text-zinc-600">
+                        <span>Subtotal</span>
+                        <span class="font-semibold text-zinc-900">
+                            {{ subtotal() | number:'1.2-2' }} C$
+                        </span>
+                    </div>
+
+                    @if (totalDiscount() > 0) {
+                    <div class="rounded-2xl bg-zinc-50 border border-zinc-200 p-3 space-y-2">
+
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="font-bold text-zinc-700">
+                                Descuentos aplicados
+                            </span>
+
+                            <span class="font-black text-zinc-900">
+                                -{{ totalDiscount() | number:'1.2-2' }} C$
+                            </span>
+                        </div>
+
+                        <div class="space-y-1">
+                            @for (item of cart(); track item.product.id + '-' + item.size) {
+                            @if (item.discount > 0) {
+                            <div class="flex justify-between items-center text-xs text-zinc-500">
+                                <span>
+                                    Talla {{ item.size }} × {{ item.quantity }}
+                                </span>
+
+                                <span class="font-semibold">
+                                    -{{ item.discount * item.quantity | number:'1.2-2' }} C$
+                                </span>
+                            </div>
+                            }
+                            }
+                        </div>
+
+                    </div>
+                    }
+
+                    <div class="flex justify-between items-center text-sm text-zinc-600">
+                        <span>Comisión por Pedido</span>
+                        <span class="font-semibold text-zinc-900">
+                            {{ comision() | number:'1.2-2' }} C$
+                        </span>
+                    </div>
+
+                    <div class="border-t border-dashed pt-4 flex justify-between items-end gap-4">
+
+                        <div>
+                            <p class="text-sm text-zinc-500">
+                                Total a pagar
+                            </p>
+
+                            <p class="text-2xl sm:text-3xl font-black">
+                                {{ total() | number:'1.2-2' }} C$
+                            </p>
+                        </div>
+
+                        <span class="text-xs sm:text-sm font-bold px-3 sm:px-4 py-2 rounded-full
+                bg-zinc-100 text-zinc-700 whitespace-nowrap">
+                            {{ cartCount() }} artículo(s)
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <button (click)="openPayment()" class="mt-6 w-full bg-zinc-950 text-white py-4 rounded-2xl
+    font-bold hover:bg-zinc-800 transition
+    shadow-[0_12px_35px_rgba(0,0,0,0.15)]
+    active:scale-[0.98] cursor-pointer">
+
+                    Solicitar pedido
+
+                </button>
+
+            </div>
+
+            }
+
+        </div>
+    </div>
+
+</div>
+}
+
+@if (paymentOpen()) {
+<div class="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
+
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-md cursor-pointer animate-fadeIn"
+        (click)="requestClosePayment()">
+    </div>
+
+    <div class="relative bg-white w-full sm:max-w-4xl sm:mx-4
+        rounded-t-[2rem] sm:rounded-[2rem]
+        shadow-[0_25px_80px_rgba(0,0,0,0.35)]
+        overflow-hidden animate-modalIn">
+
+        <button (click)="requestClosePayment()" class="absolute top-5 right-5 z-10 w-10 h-10 rounded-full
+            flex items-center justify-center
+            bg-zinc-100 text-zinc-500
+            hover:bg-black hover:text-white
+            transition cursor-pointer active:scale-95">
+            ✕
+        </button>
+
+        <section class="grid grid-cols-1 lg:grid-cols-2">
+
+            <div class="bg-zinc-950 text-white p-8 lg:p-10 flex flex-col justify-between min-h-[340px]">
+
+                <div>
+                    <span class="text-xs uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                        Pago seguro
+                    </span>
+
+                    <h2 class="text-3xl sm:text-4xl font-black mt-3">
+                        Revisa tus datos antes de continuar
+                    </h2>
+
+                    <p class="text-zinc-400 mt-4 leading-relaxed">
+                        Por el momento solo se aceptan tarjetas Visa. Completa todos los campos para solicitar el
+                        pedido.
+                    </p>
+                </div>
+
+                <div class="mt-10 card-perspective">
+
+                    <button type="button" (click)="toggleCardFlip()"
+                        class="relative w-full h-56 cursor-pointer text-left">
+
+                        <div class="card-3d" [class.card-flipped]="cardFlipped()">
+
+                            <!-- FRENTE -->
+                            <div class="card-face rounded-[1.8rem] border border-white/15
+                bg-gradient-to-br from-zinc-800 to-black
+                shadow-[0_30px_70px_rgba(0,0,0,0.45)]
+                p-6">
+
+                                <div class="flex justify-between items-start">
+                                    <div class="w-12 h-9 rounded-lg bg-zinc-300"></div>
+
+                                    <span class="text-xl font-black tracking-widest">
+                                        VISA
+                                    </span>
+                                </div>
+
+                                <div class="mt-10 text-xl tracking-[0.25em] font-semibold">
+                                    {{ cardNumber() || '•••• •••• •••• ••••' }}
+                                </div>
+
+                                <div class="mt-8 flex justify-between text-xs uppercase tracking-widest text-zinc-400">
+                                    <div>
+                                        <p>Titular</p>
+                                        <p class="text-white mt-1">
+                                            {{ cardName() || 'Nombre y Apellido' }}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <p>Expira</p>
+                                        <p class="text-white mt-1">
+                                            {{ cardExpiry() || 'MM/AA' }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <p class="absolute bottom-4 right-6 text-[10px] text-zinc-500">
+                                    Click para ver CVV
+                                </p>
+
+                            </div>
+
+                            <!-- REVERSO -->
+                            <div class="card-face card-back rounded-[1.8rem] border border-white/15
+    bg-gradient-to-br from-zinc-950 via-zinc-900 to-black
+    shadow-[0_30px_70px_rgba(0,0,0,0.45)]
+    overflow-hidden">
+
+                                <div class="h-12 bg-black mt-6"></div>
+
+                                <div class="px-6 pt-5">
+
+                                    <p class="text-[8px] uppercase tracking-[0.16em] text-zinc-500 mb-2">
+                                        Authorized Signature
+                                    </p>
+
+                                    <div class="flex items-center gap-3">
+
+                                        <div class="flex-1 h-9 rounded-md bg-white overflow-hidden relative">
+                                            <div class="absolute inset-0 opacity-40"
+                                                style="background-image: repeating-linear-gradient(135deg, #e5e7eb 0px, #e5e7eb 3px, #ffffff 3px, #ffffff 7px);">
+                                            </div>
+                                        </div>
+
+                                        <div class="w-20 h-9 rounded-md bg-white text-black
+                flex items-center justify-center
+                font-mono text-base font-black tracking-[0.18em]">
+                                            {{ cardCvv() || '•••' }}
+                                        </div>
+
+                                    </div>
+
+                                    <div class="mt-5 flex items-end justify-between">
+
+                                        <div class="space-y-1">
+                                            <div class="h-1 w-24 rounded-full bg-zinc-700"></div>
+                                            <div class="h-1 w-16 rounded-full bg-zinc-700"></div>
+                                            <div class="h-1 w-20 rounded-full bg-zinc-700"></div>
+                                        </div>
+
+                                        <span class="text-xl font-black tracking-widest text-white">
+                                            VISA
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <p class="absolute bottom-4 right-6 text-[10px] text-zinc-500">
+                                    Click para volver
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="p-6 sm:p-8 lg:p-10">
+
+                <h3 class="text-2xl font-black">
+                    Datos de la tarjeta
+                </h3>
+
+                <p class="text-sm text-zinc-500 mt-2">
+                    Este formulario es visual. No procesa pagos reales.
+                </p>
+
+                <div class="mt-7 space-y-5">
+
+                    <div>
+                        <label class="text-sm font-bold text-zinc-700">
+                            Nombre del titular
+                        </label>
+
+                        <input type="text" [value]="cardName()" (keydown)="allowOnlyCardName($event)"
+                            (input)="formatCardName($any($event.target).value)" placeholder="Ej: Marlon Estrada" class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
+    outline-none focus:border-black transition">
+
+                        @if (cardName().length > 0 && cardName().trim().split(' ').length !== 2) {
+                        <p class="text-xs text-red-500 mt-2">
+                            Escribe solo nombre y apellido.
+                        </p>
+                        }
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-bold text-zinc-700">
+                            Número de tarjeta
+                        </label>
+
+                        <input type="text" maxlength="19" inputmode="numeric" [value]="cardNumber()"
+                            (keydown)="allowOnlyNumbers($event)" (input)="formatCardNumber($any($event.target).value)"
+                            placeholder="4000 0000 0000 0000" class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
+    outline-none focus:border-black transition">
+
+                        @if (cardNumber().length > 0 && !isVisaCard()) {
+                        <p class="text-xs text-red-500 mt-2">
+                            Solo se aceptan tarjetas Visa por el momento.
+                        </p>
+                        }
+
+                        @if (cardNumber().length > 0 && cardNumber().replaceAll(' ', '').length < 16) { <p
+                            class="text-xs text-zinc-500 mt-2">
+                            La tarjeta debe tener 16 dígitos.
+                            </p>
+                            }
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+
+                        <div>
+                            <label class="text-sm font-bold text-zinc-700">
+                                Vencimiento
+                            </label>
+
+                            <input type="text" maxlength="5" inputmode="numeric" [value]="cardExpiry()"
+                                (keydown)="allowOnlyNumbers($event)" (input)="formatExpiry($any($event.target).value)"
+                                placeholder="MM/AA" class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
+    outline-none focus:border-black transition">
+
+                            @if (cardExpiry().length > 0 && !/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry())) {
+                            <p class="text-xs text-red-500 mt-2">
+                                Usa un vencimiento válido: MM/AA.
+                            </p>
+                            }
+                        </div>
+
+                        <div>
+                            <label class="text-sm font-bold text-zinc-700">
+                                CVV
+                            </label>
+
+                            <input type="password" maxlength="3" inputmode="numeric" [value]="cardCvv()"
+                                (keydown)="allowOnlyNumbers($event)" (input)="formatCvv($any($event.target).value)"
+                                placeholder="123" class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
+            outline-none focus:border-black transition">
+
+                            @if (cardCvv().length > 0 && cardCvv().length < 3) { <p class="text-xs text-zinc-500 mt-2">
+                                El CVV debe tener 3 dígitos.
+                                </p>
+                                }
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="mt-8 rounded-2xl bg-zinc-50 border border-zinc-200 p-4">
+                    <div class="flex justify-between text-sm text-zinc-600">
+                        <span>Total a pagar</span>
+                        <span class="font-black text-zinc-900">
+                            {{ total() | number:'1.2-2' }} C$
+                        </span>
+                    </div>
+                </div>
+
+                <button [disabled]="!isPaymentValid()" class="mt-6 w-full bg-black text-white py-4 rounded-2xl
+                    font-bold hover:bg-zinc-800 transition cursor-pointer
+                    disabled:bg-zinc-300 disabled:cursor-not-allowed">
+
+                    Confirmar solicitud
+
+                </button>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+}
+
+@if (showExitWarning()) {
+<div class="fixed inset-0 z-[70] flex items-center justify-center px-4">
+
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+    <div class="relative bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl animate-modalIn">
+
+        <div class="w-14 h-14 rounded-full bg-zinc-100 flex items-center justify-center">
+            <iconify-icon icon="mdi:alert-outline" class="text-3xl text-zinc-700"></iconify-icon>
+        </div>
+
+        <h3 class="text-2xl font-black mt-5">
+            ¿Salir del pago?
+        </h3>
+
+        <p class="text-zinc-500 mt-3 leading-relaxed">
+            Ya escribiste información en el formulario. Si sales ahora, los datos ingresados se perderán.
+        </p>
+
+        <div class="mt-6 grid grid-cols-2 gap-3">
+
+            <button (click)="cancelExitWarning()" class="py-3 rounded-2xl border border-zinc-300 font-bold
+                hover:bg-zinc-100 transition cursor-pointer">
+                Continuar
+            </button>
+
+            <button (click)="confirmExitPayment()" class="py-3 rounded-2xl bg-black text-white font-bold
+                hover:bg-zinc-800 transition cursor-pointer">
+                Salir
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+}
+
+<button (click)="openCart()" class="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-40
+    w-14 h-14 md:w-16 md:h-16 rounded-full
+    bg-zinc-950 text-white shadow-[0_18px_45px_rgba(0,0,0,0.28)]
+    border border-white/10
+    flex items-center justify-center
+    hover:bg-zinc-800 hover:scale-105
+    transition-all duration-300 active:scale-95 cursor-pointer">
+
+    <iconify-icon icon="mdi:cart-outline" class="text-2xl md:text-3xl">
+    </iconify-icon>
+
+    @if (cartCount() > 0) {
+    <span class="absolute -top-1 -right-1 min-w-6 h-6 px-1
+        rounded-full bg-white text-black
+        text-xs font-black flex items-center justify-center
+        border border-zinc-300 shadow-md">
+        {{ cartCount() }}
+    </span>
+    }
+
+</button>
 
 <!-- CATALOGO -->
 <section id="catalog" class="max-w-7xl mx-auto px-6 lg:px-12 py-20 reveal">
@@ -104,7 +648,7 @@
     <!-- GRID PRODUCTS -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
 
-        @for (p of products; track p.name; let i = $index) {
+        @for (p of products; track p.id; let i = $index) {
 
         <article class="group rounded-[2rem] border border-zinc-200 bg-white overflow-hidden
            hover:shadow-xl transition duration-300 reveal-card" [style.animation-delay]="i * 90 + 'ms'">
@@ -191,5 +735,40 @@
 
     .animate-modalIn {
         animation: modalIn 0.25s ease-out;
+    }
+
+    .card-perspective {
+        perspective: 1200px;
+    }
+
+    .card-3d {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        transform: rotate(-3deg);
+        transition: transform 0.7s ease;
+    }
+
+    .card-3d:hover {
+        transform: rotate(0deg) scale(1.02);
+    }
+
+    .card-3d.card-flipped {
+        transform: rotateY(180deg) rotate(-3deg);
+    }
+
+    .card-3d.card-flipped:hover {
+        transform: rotateY(180deg) rotate(0deg) scale(1.02);
+    }
+
+    .card-face {
+        position: absolute;
+        inset: 0;
+        backface-visibility: hidden;
+    }
+
+    .card-back {
+        transform: rotateY(180deg);
     }
 </style>
