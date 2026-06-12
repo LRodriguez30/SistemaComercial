@@ -311,9 +311,10 @@
     </div>
 
     <div class="relative bg-white w-full sm:max-w-4xl sm:mx-4
-        rounded-t-[2rem] sm:rounded-[2rem]
-        shadow-[0_25px_80px_rgba(0,0,0,0.35)]
-        overflow-hidden animate-modalIn">
+    h-[88vh] sm:h-auto sm:max-h-[82vh]
+    rounded-t-[2rem] sm:rounded-[2rem]
+    shadow-[0_25px_80px_rgba(0,0,0,0.35)]
+    overflow-hidden animate-modalIn flex flex-col">
 
         <button (click)="requestClosePayment()" class="absolute top-5 right-5 z-10 w-10 h-10 rounded-full
             flex items-center justify-center
@@ -323,6 +324,9 @@
             ✕
         </button>
 
+        <div class="overflow-y-auto custom-scrollbar">
+
+        
         <section class="grid grid-cols-1 lg:grid-cols-2">
 
             <div class="bg-zinc-950 text-white p-8 lg:p-10 flex flex-col justify-between min-h-[340px]">
@@ -559,6 +563,7 @@
             </div>
 
         </section>
+        </div>
 
     </div>
 
