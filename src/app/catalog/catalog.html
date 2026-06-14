@@ -16,7 +16,8 @@
 
             <!-- IMAGE -->
             <div class="bg-zinc-100">
-                <img [src]="selectedProduct()?.image" class="w-full aspect-square object-cover" />
+                <img [src]="selectedProduct()?.image" (error)="$any($event.target).src = 'Not Found.png'"
+                    class="w-full aspect-square object-cover" />
             </div>
 
             <!-- INFO -->
@@ -93,7 +94,7 @@
     rounded-t-[2rem] sm:rounded-[2rem]
     shadow-[0_25px_80px_rgba(0,0,0,0.35)]
     overflow-hidden animate-modalIn flex flex-col">
-        <div class="p-5 sm:p-8 overflow-y-auto custom-scrollbar">
+        <div class="pt-5 pr-5 pl-5 sm:pt-8 sm:pr-8 sm:pl-8 overflow-y-auto custom-scrollbar flex flex-col flex-1">
 
             <button (click)="closeCart()" class="absolute top-5 right-5 w-10 h-10 rounded-full
             flex items-center justify-center
@@ -119,7 +120,7 @@
 
             @if (cart().length === 0) {
 
-            <div class="mt-10 border border-dashed border-zinc-300 rounded-[1.5rem] p-8 text-center">
+            <div class="mt-10 border border-dashed border-zinc-300 rounded-[1.5rem] p-8 text-center mb-6">
                 <div class="w-14 h-14 mx-auto rounded-full bg-zinc-100 flex items-center justify-center">
                     <iconify-icon icon="mdi:cart-outline" class="text-3xl text-zinc-500"></iconify-icon>
                 </div>
@@ -135,7 +136,7 @@
 
             } @else {
 
-            <div class="mt-8 space-y-4">
+            <div class="mt-8 space-y-4 flex-1">
 
                 @for (item of cart(); track item.product.id + '-' + item.size; let i = $index) {
 
@@ -146,7 +147,7 @@
                     <div class="flex gap-4">
 
                         <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-zinc-100 overflow-hidden shrink-0">
-                            <img [src]="item.product.image"
+                            <img [src]="item.product.image" (error)="$any($event.target).src = 'Not Found.png'"
                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                         </div>
 
@@ -213,7 +214,7 @@
             </div>
 
             <div class="sticky bottom-0 -mx-5 sm:-mx-8 mt-8 border-t border-zinc-200
-    bg-white/95 backdrop-blur px-5 sm:px-8 pt-5 pb-1">
+    bg-white/95 backdrop-blur px-5 sm:px-8 pt-5 pb-3">
 
                 <div class="space-y-3">
 
@@ -326,243 +327,247 @@
 
         <div class="overflow-y-auto custom-scrollbar">
 
-        
-        <section class="grid grid-cols-1 lg:grid-cols-2">
 
-            <div class="bg-zinc-950 text-white p-8 lg:p-10 flex flex-col justify-between min-h-[340px]">
+            <section class="grid grid-cols-1 lg:grid-cols-2">
 
-                <div>
-                    <span class="text-xs uppercase tracking-[0.2em] text-zinc-400 font-bold">
-                        Pago seguro
-                    </span>
+                <div class="bg-zinc-950 text-white p-8 lg:p-10 flex flex-col justify-between min-h-[340px]">
 
-                    <h2 class="text-3xl sm:text-4xl font-black mt-3">
-                        Revisa tus datos antes de continuar
-                    </h2>
+                    <div>
+                        <span class="text-xs uppercase tracking-[0.2em] text-zinc-400 font-bold">
+                            Pago seguro
+                        </span>
 
-                    <p class="text-zinc-400 mt-4 leading-relaxed">
-                        Por el momento solo se aceptan tarjetas Visa. Completa todos los campos para solicitar el
-                        pedido.
-                    </p>
-                </div>
+                        <h2 class="text-3xl sm:text-4xl font-black mt-3">
+                            Revisa tus datos antes de continuar
+                        </h2>
 
-                <div class="mt-10 card-perspective">
+                        <p class="text-zinc-400 mt-4 leading-relaxed">
+                            Por el momento solo se aceptan tarjetas Visa. Completa todos los campos para solicitar el
+                            pedido.
+                        </p>
+                    </div>
 
-                    <button type="button" (click)="toggleCardFlip()"
-                        class="relative w-full h-56 cursor-pointer text-left">
+                    <div class="mt-10 card-perspective">
 
-                        <div class="card-3d" [class.card-flipped]="cardFlipped()">
+                        <button type="button" (click)="toggleCardFlip()"
+                            class="relative w-full h-56 cursor-pointer text-left">
 
-                            <!-- FRENTE -->
-                            <div class="card-face rounded-[1.8rem] border border-white/15
+                            <div class="card-3d" [class.card-flipped]="cardFlipped()">
+
+                                <!-- FRENTE -->
+                                <div class="card-face rounded-[1.8rem] border border-white/15
                 bg-gradient-to-br from-zinc-800 to-black
                 shadow-[0_30px_70px_rgba(0,0,0,0.45)]
                 p-6">
 
-                                <div class="flex justify-between items-start">
-                                    <div class="w-12 h-9 rounded-lg bg-zinc-300"></div>
+                                    <div class="flex justify-between items-start">
+                                        <div class="w-12 h-9 rounded-lg bg-zinc-300"></div>
 
-                                    <span class="text-xl font-black tracking-widest">
-                                        VISA
-                                    </span>
-                                </div>
-
-                                <div class="mt-10 text-xl tracking-[0.25em] font-semibold">
-                                    {{ cardNumber() || '•••• •••• •••• ••••' }}
-                                </div>
-
-                                <div class="mt-8 flex justify-between text-xs uppercase tracking-widest text-zinc-400">
-                                    <div>
-                                        <p>Titular</p>
-                                        <p class="text-white mt-1">
-                                            {{ cardName() || 'Nombre y Apellido' }}
-                                        </p>
+                                        <span class="text-xl font-black tracking-widest">
+                                            VISA
+                                        </span>
                                     </div>
 
-                                    <div>
-                                        <p>Expira</p>
-                                        <p class="text-white mt-1">
-                                            {{ cardExpiry() || 'MM/AA' }}
-                                        </p>
+                                    <div class="mt-10 text-xl tracking-[0.25em] font-semibold">
+                                        {{ cardNumber() || '•••• •••• •••• ••••' }}
                                     </div>
+
+                                    <div
+                                        class="mt-8 flex justify-between text-xs uppercase tracking-widest text-zinc-400">
+                                        <div>
+                                            <p>Titular</p>
+                                            <p class="text-white mt-1">
+                                                {{ cardName() || 'Nombre y Apellido' }}
+                                            </p>
+                                        </div>
+
+                                        <div>
+                                            <p>Expira</p>
+                                            <p class="text-white mt-1">
+                                                {{ cardExpiry() || 'MM/AA' }}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <p class="absolute bottom-4 right-6 text-[10px] text-zinc-500">
+                                        Click para ver CVV
+                                    </p>
+
                                 </div>
 
-                                <p class="absolute bottom-4 right-6 text-[10px] text-zinc-500">
-                                    Click para ver CVV
-                                </p>
-
-                            </div>
-
-                            <!-- REVERSO -->
-                            <div class="card-face card-back rounded-[1.8rem] border border-white/15
+                                <!-- REVERSO -->
+                                <div class="card-face card-back rounded-[1.8rem] border border-white/15
     bg-gradient-to-br from-zinc-950 via-zinc-900 to-black
     shadow-[0_30px_70px_rgba(0,0,0,0.45)]
     overflow-hidden">
 
-                                <div class="h-12 bg-black mt-6"></div>
+                                    <div class="h-12 bg-black mt-6"></div>
 
-                                <div class="px-6 pt-5">
+                                    <div class="px-6 pt-5">
 
-                                    <p class="text-[8px] uppercase tracking-[0.16em] text-zinc-500 mb-2">
-                                        Authorized Signature
-                                    </p>
+                                        <p class="text-[8px] uppercase tracking-[0.16em] text-zinc-500 mb-2">
+                                            Authorized Signature
+                                        </p>
 
-                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-3">
 
-                                        <div class="flex-1 h-9 rounded-md bg-white overflow-hidden relative">
-                                            <div class="absolute inset-0 opacity-40"
-                                                style="background-image: repeating-linear-gradient(135deg, #e5e7eb 0px, #e5e7eb 3px, #ffffff 3px, #ffffff 7px);">
+                                            <div class="flex-1 h-9 rounded-md bg-white overflow-hidden relative">
+                                                <div class="absolute inset-0 opacity-40"
+                                                    style="background-image: repeating-linear-gradient(135deg, #e5e7eb 0px, #e5e7eb 3px, #ffffff 3px, #ffffff 7px);">
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <div class="w-20 h-9 rounded-md bg-white text-black
+                                            <div class="w-20 h-9 rounded-md bg-white text-black
                 flex items-center justify-center
                 font-mono text-base font-black tracking-[0.18em]">
-                                            {{ cardCvv() || '•••' }}
+                                                {{ cardCvv() || '•••' }}
+                                            </div>
+
+                                        </div>
+
+                                        <div class="mt-5 flex items-end justify-between">
+
+                                            <div class="space-y-1">
+                                                <div class="h-1 w-24 rounded-full bg-zinc-700"></div>
+                                                <div class="h-1 w-16 rounded-full bg-zinc-700"></div>
+                                                <div class="h-1 w-20 rounded-full bg-zinc-700"></div>
+                                            </div>
+
+                                            <span class="text-xl font-black tracking-widest text-white">
+                                                VISA
+                                            </span>
+
                                         </div>
 
                                     </div>
 
-                                    <div class="mt-5 flex items-end justify-between">
-
-                                        <div class="space-y-1">
-                                            <div class="h-1 w-24 rounded-full bg-zinc-700"></div>
-                                            <div class="h-1 w-16 rounded-full bg-zinc-700"></div>
-                                            <div class="h-1 w-20 rounded-full bg-zinc-700"></div>
-                                        </div>
-
-                                        <span class="text-xl font-black tracking-widest text-white">
-                                            VISA
-                                        </span>
-
-                                    </div>
+                                    <p class="absolute bottom-4 right-6 text-[10px] text-zinc-500">
+                                        Click para volver
+                                    </p>
 
                                 </div>
 
-                                <p class="absolute bottom-4 right-6 text-[10px] text-zinc-500">
-                                    Click para volver
-                                </p>
+                            </div>
 
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="p-6 sm:p-8 lg:p-10">
+
+                    <h3 class="text-2xl font-black">
+                        Datos de la tarjeta
+                    </h3>
+
+                    <p class="text-sm text-zinc-500 mt-2">
+                        Este formulario es visual. No procesa pagos reales.
+                    </p>
+
+                    <div class="mt-7 space-y-5">
+
+                        <div>
+                            <label class="text-sm font-bold text-zinc-700">
+                                Nombre del titular
+                            </label>
+
+                            <input type="text" [value]="cardName()" (keydown)="allowOnlyCardName($event)"
+                                (input)="formatCardName($any($event.target).value)" placeholder="Ej: Marlon Estrada"
+                                class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
+    outline-none focus:border-black transition">
+
+                            @if (cardName().length > 0 && cardName().trim().split(' ').length !== 2) {
+                            <p class="text-xs text-red-500 mt-2">
+                                Escribe solo nombre y apellido.
+                            </p>
+                            }
+                        </div>
+
+                        <div>
+                            <label class="text-sm font-bold text-zinc-700">
+                                Número de tarjeta
+                            </label>
+
+                            <input type="text" maxlength="19" inputmode="numeric" [value]="cardNumber()"
+                                (keydown)="allowOnlyNumbers($event)"
+                                (input)="formatCardNumber($any($event.target).value)" placeholder="4000 0000 0000 0000"
+                                class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
+    outline-none focus:border-black transition">
+
+                            @if (cardNumber().length > 0 && !isVisaCard()) {
+                            <p class="text-xs text-red-500 mt-2">
+                                Solo se aceptan tarjetas Visa por el momento.
+                            </p>
+                            }
+
+                            @if (cardNumber().length > 0 && cardNumber().replaceAll(' ', '').length < 16) { <p
+                                class="text-xs text-zinc-500 mt-2">
+                                La tarjeta debe tener 16 dígitos.
+                                </p>
+                                }
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+
+                            <div>
+                                <label class="text-sm font-bold text-zinc-700">
+                                    Vencimiento
+                                </label>
+
+                                <input type="text" maxlength="5" inputmode="numeric" [value]="cardExpiry()"
+                                    (keydown)="allowOnlyNumbers($event)"
+                                    (input)="formatExpiry($any($event.target).value)" placeholder="MM/AA" class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
+    outline-none focus:border-black transition">
+
+                                @if (cardExpiry().length > 0 && !/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry())) {
+                                <p class="text-xs text-red-500 mt-2">
+                                    Usa un vencimiento válido: MM/AA.
+                                </p>
+                                }
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-bold text-zinc-700">
+                                    CVV
+                                </label>
+
+                                <input type="password" maxlength="3" inputmode="numeric" [value]="cardCvv()"
+                                    (keydown)="allowOnlyNumbers($event)" (input)="formatCvv($any($event.target).value)"
+                                    placeholder="123" class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
+            outline-none focus:border-black transition">
+
+                                @if (cardCvv().length > 0 && cardCvv().length < 3) { <p
+                                    class="text-xs text-zinc-500 mt-2">
+                                    El CVV debe tener 3 dígitos.
+                                    </p>
+                                    }
                             </div>
 
                         </div>
+
+                    </div>
+
+                    <div class="mt-8 rounded-2xl bg-zinc-50 border border-zinc-200 p-4">
+                        <div class="flex justify-between text-sm text-zinc-600">
+                            <span>Total a pagar</span>
+                            <span class="font-black text-zinc-900">
+                                {{ total() | number:'1.2-2' }} C$
+                            </span>
+                        </div>
+                    </div>
+
+                    <button [disabled]="!isPaymentValid()" class="mt-6 w-full bg-black text-white py-4 rounded-2xl
+                    font-bold hover:bg-zinc-800 transition cursor-pointer
+                    disabled:bg-zinc-300 disabled:cursor-not-allowed">
+
+                        Confirmar solicitud
 
                     </button>
 
                 </div>
 
-            </div>
-
-            <div class="p-6 sm:p-8 lg:p-10">
-
-                <h3 class="text-2xl font-black">
-                    Datos de la tarjeta
-                </h3>
-
-                <p class="text-sm text-zinc-500 mt-2">
-                    Este formulario es visual. No procesa pagos reales.
-                </p>
-
-                <div class="mt-7 space-y-5">
-
-                    <div>
-                        <label class="text-sm font-bold text-zinc-700">
-                            Nombre del titular
-                        </label>
-
-                        <input type="text" [value]="cardName()" (keydown)="allowOnlyCardName($event)"
-                            (input)="formatCardName($any($event.target).value)" placeholder="Ej: Marlon Estrada" class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
-    outline-none focus:border-black transition">
-
-                        @if (cardName().length > 0 && cardName().trim().split(' ').length !== 2) {
-                        <p class="text-xs text-red-500 mt-2">
-                            Escribe solo nombre y apellido.
-                        </p>
-                        }
-                    </div>
-
-                    <div>
-                        <label class="text-sm font-bold text-zinc-700">
-                            Número de tarjeta
-                        </label>
-
-                        <input type="text" maxlength="19" inputmode="numeric" [value]="cardNumber()"
-                            (keydown)="allowOnlyNumbers($event)" (input)="formatCardNumber($any($event.target).value)"
-                            placeholder="4000 0000 0000 0000" class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
-    outline-none focus:border-black transition">
-
-                        @if (cardNumber().length > 0 && !isVisaCard()) {
-                        <p class="text-xs text-red-500 mt-2">
-                            Solo se aceptan tarjetas Visa por el momento.
-                        </p>
-                        }
-
-                        @if (cardNumber().length > 0 && cardNumber().replaceAll(' ', '').length < 16) { <p
-                            class="text-xs text-zinc-500 mt-2">
-                            La tarjeta debe tener 16 dígitos.
-                            </p>
-                            }
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-
-                        <div>
-                            <label class="text-sm font-bold text-zinc-700">
-                                Vencimiento
-                            </label>
-
-                            <input type="text" maxlength="5" inputmode="numeric" [value]="cardExpiry()"
-                                (keydown)="allowOnlyNumbers($event)" (input)="formatExpiry($any($event.target).value)"
-                                placeholder="MM/AA" class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
-    outline-none focus:border-black transition">
-
-                            @if (cardExpiry().length > 0 && !/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExpiry())) {
-                            <p class="text-xs text-red-500 mt-2">
-                                Usa un vencimiento válido: MM/AA.
-                            </p>
-                            }
-                        </div>
-
-                        <div>
-                            <label class="text-sm font-bold text-zinc-700">
-                                CVV
-                            </label>
-
-                            <input type="password" maxlength="3" inputmode="numeric" [value]="cardCvv()"
-                                (keydown)="allowOnlyNumbers($event)" (input)="formatCvv($any($event.target).value)"
-                                placeholder="123" class="mt-2 w-full rounded-2xl border border-zinc-200 px-4 py-3
-            outline-none focus:border-black transition">
-
-                            @if (cardCvv().length > 0 && cardCvv().length < 3) { <p class="text-xs text-zinc-500 mt-2">
-                                El CVV debe tener 3 dígitos.
-                                </p>
-                                }
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="mt-8 rounded-2xl bg-zinc-50 border border-zinc-200 p-4">
-                    <div class="flex justify-between text-sm text-zinc-600">
-                        <span>Total a pagar</span>
-                        <span class="font-black text-zinc-900">
-                            {{ total() | number:'1.2-2' }} C$
-                        </span>
-                    </div>
-                </div>
-
-                <button [disabled]="!isPaymentValid()" class="mt-6 w-full bg-black text-white py-4 rounded-2xl
-                    font-bold hover:bg-zinc-800 transition cursor-pointer
-                    disabled:bg-zinc-300 disabled:cursor-not-allowed">
-
-                    Confirmar solicitud
-
-                </button>
-
-            </div>
-
-        </section>
+            </section>
         </div>
 
     </div>
@@ -653,16 +658,76 @@
     <!-- GRID PRODUCTS -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
 
-        @for (p of products; track p.id; let i = $index) {
+        @for (p of products(); track p.id; let i = $index) {
 
         <article class="group rounded-[2rem] border border-zinc-200 bg-white overflow-hidden
            hover:shadow-xl transition duration-300 reveal-card" [style.animation-delay]="i * 90 + 'ms'">
 
             <!-- IMAGE -->
             <div class="bg-zinc-100 overflow-hidden">
-                <img [src]="p.image" [alt]="p.name"
+                <img [src]="getProductImage(p)" [alt]="p.name" (error)="$any($event.target).src = 'Not Found.png'"
                     class="w-full aspect-square object-cover group-hover:scale-105 transition duration-500" />
             </div>
+
+            @if (p.colors && p.colors.length > 0) {
+            <div class="bg-white px-6 pt-4 flex items-center justify-center">
+
+                <div class="flex items-center gap-2
+        bg-zinc-100 border border-zinc-200
+        px-3 py-2 rounded-full">
+
+                    @if (p.colors.length > visibleColorsLimit) {
+                    <button type="button" (click)="moveColorsLeft(p)" [disabled]="!canMoveColorsLeft(p)" class="w-7 h-7 rounded-full bg-white border border-zinc-200
+            flex items-center justify-center
+            text-sm font-black text-zinc-600
+            hover:bg-zinc-200 transition cursor-pointer active:scale-95
+            disabled:opacity-35 disabled:cursor-not-allowed">
+                        ‹
+                    </button>
+                    }
+
+                    @for(c of getVisibleColors(p); track $index) {
+                    <button type="button" (click)="selectColor(p, c)" class="relative w-5 h-5 rounded-full border border-white
+    shadow-[0_0_0_1px_rgba(0,0,0,0.18)]
+    overflow-hidden cursor-pointer active:scale-95 transition" [class.ring-2]="getSelectedColor(p).name === c.name"
+                        [class.ring-black]="getSelectedColor(p).name === c.name">
+
+                        @if (!c.secondaryHex && !c.thirdHex) {
+                        <span class="absolute inset-0" [style.background]="c.hex"></span>
+                        }
+
+                        @if (c.secondaryHex && !c.thirdHex) {
+                        <span class="absolute inset-0 grid grid-cols-2">
+                            <span [style.background]="c.hex"></span>
+                            <span [style.background]="c.secondaryHex"></span>
+                        </span>
+                        }
+
+                        @if (c.secondaryHex && c.thirdHex) {
+                        <span class="absolute inset-0 grid grid-cols-3">
+                            <span [style.background]="c.hex"></span>
+                            <span [style.background]="c.secondaryHex"></span>
+                            <span [style.background]="c.thirdHex"></span>
+                        </span>
+                        }
+
+                    </button>
+                    }
+
+                    @if (p.colors.length > visibleColorsLimit) {
+                    <button type="button" (click)="moveColorsRight(p)" [disabled]="!canMoveColorsRight(p)" class="w-7 h-7 rounded-full bg-white border border-zinc-200
+            flex items-center justify-center
+            text-sm font-black text-zinc-600
+            hover:bg-zinc-200 transition cursor-pointer active:scale-95
+            disabled:opacity-35 disabled:cursor-not-allowed">
+                        ›
+                    </button>
+                    }
+
+                </div>
+
+            </div>
+            }
 
             <!-- INFO -->
             <div class="p-6">
