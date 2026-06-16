@@ -1,74 +1,80 @@
-
-
 <!-- HERO -->
-<section class="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24">
+<div class="relative overflow-hidden">
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+  <div class="absolute inset-0 pointer-events-none opacity-[0.04]">
+    <div class="home-lines"></div>
+  </div>
 
-    <!-- TEXT -->
-    <div class="reveal">
+  <section class="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24">
 
-      <span class="inline-block text-4xl lg:text-5xl italic text-zinc-700 tracking-wide"
-        style="font-family: 'Playfair Display', serif;">
-        Chinelas Pasos
-      </span>
 
-      <h2 class="text-5xl lg:text-6xl font-black leading-[1.05] mt-6 max-w-xl">
-        Comodidad que se siente desde el primer paso.
-      </h2>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-      <p class="text-zinc-600 text-lg leading-relaxed mt-6 max-w-lg">
-        Chinelas diseñadas para tu día a día: ligeras, suaves y resistentes al uso constante.
-        Perfectas para estar en casa, salir rápido o moverte con total libertad sin preocuparte por el cansancio.
-      </p>
+      <!-- TEXT -->
+      <div class="reveal">
 
-      <div class="flex flex-wrap gap-4 mt-10">
+        <span class="inline-block text-4xl lg:text-5xl italic text-zinc-700 tracking-wide"
+          style="font-family: 'Playfair Display', serif;">
+          Chinelas Pasos
+        </span>
 
-        <a (click)="scrollTo('models')" class="bg-black text-white px-7 py-4 rounded-2xl text-sm font-semibold
+        <h2 class="text-5xl lg:text-6xl font-black leading-[1.05] mt-6 max-w-xl">
+          Comodidad que se siente desde el primer paso.
+        </h2>
+
+        <p class="text-zinc-600 text-lg leading-relaxed mt-6 max-w-lg">
+          Chinelas diseñadas para tu día a día: ligeras, suaves y resistentes al uso constante.
+          Perfectas para estar en casa, salir rápido o moverte con total libertad sin preocuparte por el cansancio.
+        </p>
+
+        <div class="flex flex-wrap gap-4 mt-10">
+
+          <a (click)="scrollTo('models')" class="bg-black text-white px-7 py-4 rounded-2xl text-sm font-semibold
          hover:bg-zinc-800 transition cursor-pointer
          active:scale-95 active:brightness-90
          focus:outline-none focus:ring-2 focus:ring-zinc-400/40">
-          Ver modelos
-        </a>
+            Ver modelos
+          </a>
 
-        <a (click)="scrollTo('location')" class="border border-zinc-300 px-7 py-4 rounded-2xl text-sm font-semibold
-         hover:bg-zinc-100 transition cursor-pointer
+          <a (click)="scrollTo('location')" class="border border-zinc-300 px-7 py-4 rounded-2xl text-sm font-semibold
+         hover:bg-zinc-100 transition cursor-pointer bg-white
          active:scale-95 active:brightness-90
          focus:outline-none focus:ring-2 focus:ring-zinc-400/40">
-          Dónde comprar
-        </a>
+            Dónde comprar
+          </a>
+
+        </div>
+
+      </div>
+
+      <!-- IMAGE -->
+      <div class="relative reveal">
+
+        <div class="overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-zinc-100 shadow-sm">
+
+          <img ngSrc="Crocs Pasos.png" width="1254" height="1254" class="w-full aspect-square object-cover" priority />
+
+        </div>
+
+        <!-- FLOAT CARD -->
+        <div class="absolute -bottom-6 left-6 bg-white border border-zinc-200 rounded-2xl px-6 py-5 shadow-xl">
+
+          <p class="text-xs uppercase tracking-[0.2em] text-zinc-500 font-semibold">
+            Hechas para durar
+          </p>
+
+          <h3 class="font-black text-lg mt-1">
+            EVA ligero y flexible
+          </h3>
+
+        </div>
 
       </div>
 
     </div>
 
-    <!-- IMAGE -->
-    <div class="relative reveal">
-
-      <div class="overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-zinc-100 shadow-sm">
-
-        <img ngSrc="Crocs Pasos.png" width="1254" height="1254" class="w-full aspect-square object-cover" priority />
-
-      </div>
-
-      <!-- FLOAT CARD -->
-      <div class="absolute -bottom-6 left-6 bg-white border border-zinc-200 rounded-2xl px-6 py-5 shadow-xl">
-
-        <p class="text-xs uppercase tracking-[0.2em] text-zinc-500 font-semibold">
-          Hechas para durar
-        </p>
-
-        <h3 class="font-black text-lg mt-1">
-          EVA ligero y flexible
-        </h3>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
+  </section>
+</div>
 
 <!-- BENEFITS -->
 <section id="beneficios" class="border-y border-zinc-200 bg-zinc-50 reveal">
@@ -257,7 +263,7 @@
     </span>
 
     <h2 class="reveal reveal-delay-1 text-4xl lg:text-5xl font-black mt-3">
-      Modelos Estándar
+      Modelos Destacados
     </h2>
 
   </div>
@@ -538,3 +544,323 @@
     animation: modalIn 0.25s ease-out;
   }
 </style>
+
+<!-- FAQ -->
+<section id="faq" class="relative bg-white border-t border-zinc-200">
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-12 py-20">
+
+    <div class="max-w-3xl mb-14 reveal">
+
+      <span class="text-sm uppercase tracking-[0.2em] text-zinc-500 font-semibold">
+        Preguntas frecuentes
+      </span>
+
+      <h2 class="text-4xl lg:text-5xl font-black mt-3">
+        Dudas sobre PASOS
+      </h2>
+
+      <p class="text-zinc-600 text-lg leading-relaxed mt-5">
+        Aquí respondemos las preguntas más comunes sobre pagos, puntos de venta,
+        disponibilidad y atención. Si tienes otra duda, puedes escribirnos por
+        WhatsApp o Facebook.
+      </p>
+
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 reveal">
+
+      <article
+        class="group rounded-[2rem] border border-zinc-200 bg-zinc-50 p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shrink-0">
+            <iconify-icon icon="lucide:credit-card" class="text-xl"></iconify-icon>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-black">¿Qué métodos de pago aceptan?</h3>
+            <p class="text-zinc-600 leading-relaxed mt-3">
+              Aceptamos pagos en efectivo y con tarjeta, según la disponibilidad
+              del punto de venta donde realices tu compra.
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <article
+        class="group rounded-[2rem] border border-zinc-200 bg-zinc-50 p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shrink-0">
+            <iconify-icon icon="lucide:map-pin" class="text-xl"></iconify-icon>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-black">¿Dónde puedo comprar productos PASOS?</h3>
+            <p class="text-zinc-600 leading-relaxed mt-3">
+              Puedes encontrarnos en nuestros puntos de venta disponibles.
+              Para ver la ubicación exacta, visita el apartado de puntos de venta
+              o consulta directamente por WhatsApp o Facebook.
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <article
+        class="group rounded-[2rem] border border-zinc-200 bg-zinc-50 p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shrink-0">
+            <iconify-icon icon="lucide:shield-check" class="text-xl"></iconify-icon>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-black">¿Es seguro comprar en los puntos de venta?</h3>
+            <p class="text-zinc-600 leading-relaxed mt-3">
+              Sí. Nuestros puntos de venta están pensados para brindar una compra
+              directa, clara y confiable. Si tienes dudas antes de visitar una ubicación,
+              puedes contactarnos para confirmar detalles.
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <article
+        class="group rounded-[2rem] border border-zinc-200 bg-zinc-50 p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shrink-0">
+            <iconify-icon icon="lucide:package-check" class="text-xl"></iconify-icon>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-black">¿Cómo sé si hay disponibilidad?</h3>
+            <p class="text-zinc-600 leading-relaxed mt-3">
+              La disponibilidad puede variar según el modelo, color y punto de venta.
+              Para confirmar existencias antes de llegar, recomendamos escribirnos
+              por WhatsApp o Facebook.
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <article
+        class="group rounded-[2rem] border border-zinc-200 bg-zinc-50 p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shrink-0">
+            <iconify-icon icon="lucide:headphones" class="text-xl"></iconify-icon>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-black">¿Hay atención al cliente?</h3>
+            <p class="text-zinc-600 leading-relaxed mt-3">
+              Sí. Puedes comunicarte con nosotros para resolver dudas sobre modelos,
+              tallas, colores, disponibilidad o puntos de venta.
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <article
+        class="group rounded-[2rem] border border-zinc-200 bg-black text-white p-7 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-white text-black flex items-center justify-center shrink-0">
+            <iconify-icon icon="lucide:message-circle" class="text-xl"></iconify-icon>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-black">¿Cuál es el número de atención?</h3>
+            <p class="text-zinc-300 leading-relaxed mt-3">
+              Para consultas directas, escríbenos por WhatsApp al
+              <span class="font-bold text-white">+505 XXXX XXXX</span>
+              o contáctanos por nuestra página de Facebook.
+            </p>
+
+            <div class="flex flex-wrap gap-3 mt-6">
+              <a
+                class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white text-black text-sm font-semibold transition active:scale-95 cursor-pointer">
+                <iconify-icon icon="lucide:message-circle"></iconify-icon>
+                WhatsApp
+              </a>
+
+              <a
+                class="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-white/20 text-white text-sm font-semibold hover:bg-white/10 transition active:scale-95 cursor-pointer">
+                <iconify-icon icon="lucide:facebook"></iconify-icon>
+                Facebook
+              </a>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- TESTIMONIOS -->
+<section id="reviews" class="bg-zinc-50 border-t border-zinc-200">
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-12 py-20 reveal">
+
+    <div class="mb-12">
+      <span class="text-sm uppercase tracking-[0.2em] text-zinc-500 font-semibold">
+        Opiniones verificadas
+      </span>
+
+      <h2 class="text-4xl lg:text-5xl font-black mt-3">
+        Experiencias de clientes
+      </h2>
+
+      <p class="text-zinc-600 text-lg leading-relaxed mt-5 max-w-3xl">
+        Comentarios y calificaciones de clientes que han comprado productos PASOS
+        en el punto de venta del Mercado Oriental.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
+
+      <!-- CALIFICACIÓN GENERAL -->
+      <aside class="rounded-2xl border border-zinc-200 bg-white p-7 h-fit">
+
+        <p class="text-sm text-zinc-500 font-semibold">
+          Calificación promedio
+        </p>
+
+        <div class="flex items-end gap-3 mt-3">
+          <h3 class="text-5xl font-black">{{ averageRating }}</h3>
+          <span class="text-zinc-500 mb-2">/ 5</span>
+        </div>
+
+        <div class="flex gap-1 mt-4 text-black">
+          @for (star of [1,2,3,4,5]; track star) {
+          <iconify-icon [icon]="getStarIcon(averageRating, star)" class="text-2xl text-black">
+          </iconify-icon>
+          }
+        </div>
+
+        <p class="text-zinc-600 leading-relaxed mt-5">
+          Basado en reseñas de clientes, experiencias de compra y comentarios
+          recibidos en el punto de venta del Mercado Oriental.
+        </p>
+
+      </aside>
+
+      <!-- CARRUSEL -->
+      <div class="relative">
+
+        <!-- CONTROLES -->
+        <div class="flex items-center justify-between gap-4 mb-6">
+
+          <button type="button" (click)="previousReview()" class="w-11 h-11 rounded-full border border-zinc-300 bg-white
+                   flex items-center justify-center
+                   hover:bg-black hover:text-white transition
+                   active:scale-95 cursor-pointer" aria-label="Opiniones anteriores">
+            <iconify-icon icon="lucide:arrow-left" class="text-xl"></iconify-icon>
+          </button>
+
+          <p class="text-sm text-zinc-500 font-semibold">
+            {{ currentReviewIndex + 1 }} / {{ reviewGroups.length }}
+          </p>
+
+          <button type="button" (click)="nextReview()" class="w-11 h-11 rounded-full border border-zinc-300 bg-white
+                   flex items-center justify-center
+                   hover:bg-black hover:text-white transition
+                   active:scale-95 cursor-pointer" aria-label="Más opiniones">
+            <iconify-icon icon="lucide:arrow-right" class="text-xl"></iconify-icon>
+          </button>
+
+        </div>
+
+        <div class="overflow-hidden rounded-2xl">
+
+          <div class="flex transition-transform duration-500 ease-out"
+            [style.transform]="'translateX(-' + (currentReviewIndex * 100) + '%)'">
+
+            @for (group of reviewGroups; track $index) {
+
+            <div class="min-w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              @for (review of group; track $index) {
+
+              <article class="rounded-2xl border border-zinc-200 bg-white p-6 min-h-[280px] flex flex-col">
+
+                <div class="flex items-start justify-between gap-4">
+
+                  <div>
+                    <h3 class="font-black text-zinc-900">
+                      {{ review.name }}
+                    </h3>
+
+                    <p class="text-sm text-zinc-500 mt-1">
+                      {{ review.role }}
+                    </p>
+
+                    <p class="text-sm text-zinc-500 mt-1">
+                      Punto de venta: Mercado Oriental
+                    </p>
+                  </div>
+
+                  <span
+                    class="text-xs px-3 py-1 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-600 font-semibold">
+                    Verificada
+                  </span>
+
+                </div>
+
+                <div class="flex gap-1 mt-4 text-black">
+                  @for (star of [1,2,3,4,5]; track star) {
+                  <iconify-icon [icon]="getStarIcon(review.rating, star)" class="text-xl text-black">
+                  </iconify-icon>
+                  }
+                </div>
+
+                <p class="text-zinc-600 leading-relaxed mt-4 min-h-[84px] line-clamp-3">
+                  “{{ review.comment }}”
+                </p>
+
+              </article>
+
+              }
+
+            </div>
+
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- FOTOS
+    <div class="mt-16">
+
+      <div class="mb-8">
+        <h3 class="text-3xl font-black">
+          Entregas y experiencias
+        </h3>
+
+        <p class="text-zinc-600 leading-relaxed mt-3 max-w-2xl">
+          Fotografías de entregas, compras y experiencias compartidas por clientes.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+        @for (photo of reviewPhotos; track photo.alt) {
+
+        <div class="group overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+          <img [src]="photo.image" [alt]="photo.alt"
+            class="w-full aspect-square object-cover transition duration-500 group-hover:scale-105">
+        </div>
+
+        }
+
+      </div>
+
+    </div> -->
+
+  </div>
+
+</section>

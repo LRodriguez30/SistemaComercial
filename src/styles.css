@@ -49,3 +49,8 @@ html {
   will-change: transform;
   transition: transform 0.1s linear;
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}

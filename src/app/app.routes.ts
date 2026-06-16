@@ -4,6 +4,7 @@ import { Catalog } from './catalog/catalog';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { Branch } from './branch/branch';
 import { About } from './about/about';
+import { FAQ } from './faq/faq';
 
 export const routes: Routes = [
     {
@@ -26,6 +27,11 @@ export const routes: Routes = [
         path: 'catalog',
         title: "Catálogo | Pasos",
         component: Catalog
+    },
+    {
+        path: 'faq',
+        title: "Preguntas Frecuentes | Pasos",
+        component: FAQ
     },
     {
         path: 'about',

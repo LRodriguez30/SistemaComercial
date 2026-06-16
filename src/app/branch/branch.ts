@@ -9,6 +9,9 @@ declare let L: any;
 })
 export class Branch implements AfterViewInit {
 
+  private userMarker: any;
+  private branchMarkers: any[] = [];
+
   activeBranch: any = null;
 
   setActiveBranch(branch: any) {
@@ -73,7 +76,10 @@ export class Branch implements AfterViewInit {
 
   private initMap(): void {
 
-    this.map = L.map('map').setView([12.1364, -86.2514], 12);
+    this.map = L.map('map', {
+      zoomControl: false
+    }).setView([12.1364, -86.2514], 12);
+
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
@@ -133,19 +139,132 @@ export class Branch implements AfterViewInit {
 
     /* ---------------- USER LOCATION ---------------- */
 
-    this.map.locate({ setView: true, maxZoom: 15 });
+    const locateUser = () => {
+      this.map.locate({
+        setView: true,
+        maxZoom: 15,
+        enableHighAccuracy: true
+      });
+    };
+
+    locateUser();
 
     this.map.on('locationfound', (e: any) => {
+      if (this.userMarker) {
+        this.userMarker.setLatLng(e.latlng);
+        this.userMarker.openPopup();
+        return;
+      }
 
-      L.marker(e.latlng, { icon: userIcon })
+      this.userMarker = L.marker(e.latlng, { icon: userIcon })
         .addTo(this.map)
-        .bindPopup('📍 Tu ubicación')
-        .openPopup();
+        .bindPopup('📍 Tu ubicación');
+
+      this.userMarker.openPopup();
     });
 
     this.map.on('locationerror', () => {
       console.log('No se pudo obtener ubicación');
     });
+    
+
+    const zoomControl = L.control({ position: 'topleft' });
+
+    zoomControl.onAdd = () => {
+      const div = L.DomUtil.create('div');
+
+      div.innerHTML = `
+        <div style="
+          display:flex;
+          flex-direction:column;
+          gap:10px;
+        ">
+
+          <button id="zoom-in-btn"
+            style="
+              width:46px;
+              height:46px;
+              background:white;
+              border-radius:16px;
+              border:1px solid #e5e7eb;
+              box-shadow:0 12px 30px rgba(0,0,0,.18);
+              cursor:pointer;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-size:20px;
+              transition:all .2s ease;
+            ">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+              <path d="M11 8v6"></path>
+              <path d="M8 11h6"></path>
+            </svg>
+          </button>
+
+          <button id="zoom-out-btn"
+            style="
+              width:46px;
+              height:46px;
+              background:white;
+              border-radius:16px;
+              border:1px solid #e5e7eb;
+              box-shadow:0 12px 30px rgba(0,0,0,.18);
+              cursor:pointer;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-size:20px;
+              transition:all .2s ease;
+            ">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+              <path d="M8 11h6"></path>
+            </svg>
+          </button>
+
+        </div>
+      `;
+
+      L.DomEvent.disableClickPropagation(div);
+      L.DomEvent.disableScrollPropagation(div);
+
+      setTimeout(() => {
+        const zoomInBtn = div.querySelector('#zoom-in-btn') as HTMLElement | null;
+        const zoomOutBtn = div.querySelector('#zoom-out-btn') as HTMLElement | null;
+
+        zoomInBtn?.addEventListener('click', () => {
+          this.map.zoomIn();
+        });
+
+        zoomOutBtn?.addEventListener('click', () => {
+          this.map.zoomOut();
+        });
+
+        [zoomInBtn, zoomOutBtn].forEach(btn => {
+          if (!btn) return;
+
+          btn.addEventListener('mouseenter', () => {
+            btn.style.transform = 'translateY(-2px)';
+            btn.style.boxShadow = '0 16px 35px rgba(0,0,0,0.22)';
+          });
+
+          btn.addEventListener('mouseleave', () => {
+            btn.style.transform = 'translateY(0)';
+            btn.style.boxShadow = '0 12px 30px rgba(0,0,0,0.18)';
+          });
+        });
+      });
+
+      return div;
+    };
+
+    zoomControl.addTo(this.map);
+
 
     /* ---------------- LEGEND ---------------- */
 
@@ -174,44 +293,50 @@ export class Branch implements AfterViewInit {
 
     legend.addTo(this.map);
 
+    /* ---------------- COMPASS ---------------- */
+
     const compass = L.control({ position: 'topright' });
 
     compass.onAdd = () => {
       const div = L.DomUtil.create('div');
 
       div.innerHTML = `
-    <div id="compass-btn"
-      style="
-        cursor:pointer;
-        width:42px;
-        height:42px;
-        background:white;
-        border-radius:50%;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        box-shadow:0 5px 15px rgba(0,0,0,0.2);
-        border:1px solid #e5e7eb;
-      "
-      class="
-        transition-all duration-200 ease-out
-        active:scale-[0.95]"
-      "
-      >
-      <iconify-icon icon="lucide:compass" style="font-size:20px;"></iconify-icon>
-    </div>
-  `;
+        <div id="compass-btn"
+          style="
+            cursor:pointer;
+            width:46px;
+            height:46px;
+            background:white;
+            border-radius:16px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow:0 12px 30px rgba(0,0,0,0.18);
+            border:1px solid #e5e7eb;
+            transition:all .2s ease;
+          ">
+          <iconify-icon icon="lucide:locate-fixed" style="font-size:21px;"></iconify-icon>
+        </div>
+      `;
 
-      // IMPORTANTE: evitar que Leaflet capture eventos
       L.DomEvent.disableClickPropagation(div);
+      L.DomEvent.disableScrollPropagation(div);
 
-      // click handler
       setTimeout(() => {
-        const btn = div.querySelector('#compass-btn');
+        const btn = div.querySelector('#compass-btn') as HTMLElement | null;
 
         btn?.addEventListener('click', () => {
-          this.map.locate({ setView: true, maxZoom: 15 });
+          locateUser();
+        });
 
+        btn?.addEventListener('mouseenter', () => {
+          btn.style.transform = 'translateY(-2px)';
+          btn.style.boxShadow = '0 16px 35px rgba(0,0,0,0.22)';
+        });
+
+        btn?.addEventListener('mouseleave', () => {
+          btn.style.transform = 'translateY(0)';
+          btn.style.boxShadow = '0 12px 30px rgba(0,0,0,0.18)';
         });
       });
 
@@ -255,6 +380,30 @@ export class Branch implements AfterViewInit {
         Abrir en Google Maps
       </button>
     `);
+
+    marker.bindPopup(`
+  <div style="min-width:180px;">
+    <b style="font-size:14px;">${branch.name}</b>
+    <p style="margin:6px 0 10px; color:#52525b; font-size:12px; line-height:1.4;">
+      ${branch.description}
+    </p>
+    <button
+      style="
+        cursor:pointer;
+        width:100%;
+        border:none;
+        background:#000;
+        color:white;
+        border-radius:999px;
+        padding:8px 12px;
+        font-size:12px;
+        font-weight:700;
+      "
+      onclick="window.open('https://www.google.com/maps?q=${branch.lat},${branch.lng}', '_blank')">
+      Abrir en Google Maps
+    </button>
+  </div>
+`);
 
     marker.openPopup();
   }

@@ -2,6 +2,8 @@ import { CommonModule } from "@angular/common";
 import { AfterViewInit, Component, computed, CUSTOM_ELEMENTS_SCHEMA, signal } from "@angular/core";
 import { ProductModel } from "./product/product";
 
+declare let L: any;
+
 interface Product {
     id: number;
     model: string;
@@ -28,6 +30,39 @@ interface CartItem {
     discount: number;
 }
 
+interface SavedOrder {
+    id: string;
+    items: CartItem[];
+    subtotal: number;
+    discount: number;
+    commission: number;
+    total: number;
+    delivery: {
+        date: string;
+        time: string;
+        lat: number | null;
+        lng: number | null;
+    };
+    payment: {
+    method: 'cash' | 'card';
+    currency?: 'cordobas' | 'dolares' | null;
+    bills?: number[];
+
+    cardName?: string;
+    cardNumber?: string;
+    cardExpiry?: string;
+};
+    status: OrderStatus;
+    createdAt: string;
+}
+
+type OrderStatus =
+  | 'received'
+  | 'preparing'
+  | 'on_the_way'
+  | 'delivered'
+  | 'cancelled';
+
 @Component({
     selector: 'app-catalog',
     imports: [CommonModule],
@@ -35,6 +70,410 @@ interface CartItem {
     templateUrl: './catalog.html'
 })
 export class Catalog implements AfterViewInit {
+
+    readonly recommendedProduct = signal<Product | null>(null);
+    readonly recommendationOpen = signal(false);
+
+    closeRecommendation() {
+        this.recommendationOpen.set(false);
+        this.unlockScroll();
+    }
+
+    continueShoppingFromRecommendation() {
+        this.closeRecommendation();
+    }
+
+    goToCartFromRecommendation() {
+        this.recommendationOpen.set(false);
+        this.openCart();
+    }
+
+    viewRecommendedProduct() {
+        const product = this.recommendedProduct();
+
+        if (!product) return;
+
+        this.recommendationOpen.set(false);
+
+        setTimeout(() => {
+            this.selectProduct(product);
+        }, 150);
+    }
+
+    private setRandomRecommendation(currentProductId: number) {
+        const availableProducts = this.products().filter(p => p.id !== currentProductId);
+
+        if (availableProducts.length === 0) {
+            this.recommendedProduct.set(null);
+            return;
+        }
+
+        const randomIndex = Math.floor(Math.random() * availableProducts.length);
+        this.recommendedProduct.set(availableProducts[randomIndex]);
+    }
+
+    readonly lastOrder = signal<SavedOrder | null>(null);
+    private readonly LAST_ORDER_STORAGE_KEY = 'pasos_last_order';
+
+    readonly orders = signal<SavedOrder[]>([]);
+    
+    readonly ordersExpanded = signal(false);
+
+    private readonly ORDERS_STORAGE_KEY = 'pasos_orders';
+
+    activeOrders = computed(() =>
+  this.orders().filter(order =>
+    order.status !== 'delivered' &&
+    order.status !== 'cancelled'
+  )
+);
+
+orderStatusMessage(status: string): string {
+  const messages: Record<string, string> = {
+    received: 'Tu pedido fue recibido correctamente.',
+    preparing: 'Estamos preparando tu pedido.',
+    on_the_way: 'El repartidor ya va en camino.',
+    delivered: 'Tu pedido fue entregado correctamente.',
+    cancelled: 'Este pedido fue cancelado.',
+  };
+
+  return messages[status] ?? 'Tu pedido está en proceso.';
+}
+
+askAboutOrder(order: any): void {
+  const phoneNumber = '50500000000';
+
+  const message = `Hola PASOS, quiero preguntar por mi pedido #${order.id.slice(0, 8)}. Estado actual: ${this.orderStatusLabel(order.status)}.`;
+
+  window.open(
+    `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`,
+    '_blank'
+  );
+}
+
+orderProgress(status: string): number {
+  const progress: Record<string, number> = {
+    received: 25,
+    preparing: 50,
+    on_the_way: 75,
+    delivered: 100,
+    cancelled: 0,
+  };
+
+  return progress[status] ?? 25;
+}
+
+orderStatusLabel(status: string): string {
+  const labels: Record<string, string> = {
+    received: 'Pedido recibido',
+    preparing: 'En preparación',
+    on_the_way: 'Repartidor en camino',
+    delivered: 'Entregado',
+    cancelled: 'Cancelado',
+  };
+
+  return labels[status] ?? 'Pedido en curso';
+}
+
+selectedOrder = signal<SavedOrder | null>(null);
+
+openOrderDetail(order: any): void {
+  this.selectedOrder.set(order);
+}
+
+closeOrderDetail(): void {
+  this.selectedOrder.set(null);
+}
+
+orderSubtotal(order: SavedOrder | null): number {
+    return order?.subtotal ?? 0;
+}
+
+orderTotalDiscount(order: SavedOrder | null): number {
+    return order?.discount ?? 0;
+}
+
+orderCommission(order: SavedOrder | null): number {
+    return order?.commission ?? 0;
+}
+
+orderCashBillsTotal(order: SavedOrder | null): number {
+    return order?.payment.bills?.reduce((sum, bill) => sum + bill, 0) ?? 0;
+}
+
+orderCashBillCount(order: SavedOrder | null, bill: number): number {
+    return order?.payment.bills?.filter(b => b === bill).length ?? 0;
+}
+
+    private saveCurrentOrder(method: 'cash' | 'card') {
+        const order: SavedOrder = {
+            id: crypto.randomUUID(),
+            items: structuredClone(this.cart()),
+            subtotal: this.subtotal(),
+            discount: this.totalDiscount(),
+            commission: this.comision(),
+            total: this.total(),
+            delivery: {
+                date: this.deliveryDate(),
+                time: this.deliveryTime(),
+                lat: this.deliveryLat(),
+                lng: this.deliveryLng()
+            },
+            payment: {
+    method,
+
+    currency: method === 'cash' ? this.cashCurrency() : null,
+    bills: method === 'cash' ? [...this.cashBills()] : [],
+
+    cardName: method === 'card' ? this.cardName() : '',
+    cardNumber: method === 'card' ? this.cardNumber() : '',
+    cardExpiry: method === 'card' ? this.cardExpiry() : '',
+},
+            status: 'preparing',
+            createdAt: new Date().toISOString()
+        };
+
+        this.lastOrder.set(order);
+
+        this.orders.update(current => [order, ...current]);
+        this.ordersExpanded.set(true);
+
+        localStorage.setItem(
+            this.ORDERS_STORAGE_KEY,
+            JSON.stringify(this.orders())
+        );
+
+        this.cart.set([]);
+        this.saveCart();
+    }
+
+    toggleOrdersExpanded() {
+        this.ordersExpanded.update(value => !value);
+    }
+
+    private deliveryMap: any;
+    private deliveryMarker: any;
+
+    openDelivery() {
+        this.cartOpen.set(false);
+        this.deliveryOpen.set(true);
+        this.lockScroll();
+
+        setTimeout(() => {
+            this.initDeliveryMap();
+        }, 100);
+    }
+
+    private initDeliveryMap(): void {
+        if (this.deliveryMap) {
+            this.deliveryMap.remove();
+            this.deliveryMap = null;
+            this.deliveryMarker = null;
+        }
+
+        this.deliveryMap = L.map('deliveryMap', {
+            zoomControl: false
+        }).setView([12.1364, -86.2514], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(this.deliveryMap);
+
+        const deliveryIcon = L.divIcon({
+            className: '',
+            html: `
+            <div style="
+                background:#000;
+                width:18px;
+                height:18px;
+                border-radius:50%;
+                border:3px solid white;
+                box-shadow:0 0 12px rgba(0,0,0,0.45);
+            "></div>
+        `,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+        });
+
+        const setDeliveryPoint = (lat: number, lng: number) => {
+            this.deliveryLat.set(lat);
+            this.deliveryLng.set(lng);
+
+            if (this.deliveryMarker) {
+                this.deliveryMarker.setLatLng([lat, lng]);
+                return;
+            }
+
+            this.deliveryMarker = L.marker([lat, lng], {
+                icon: deliveryIcon,
+                draggable: true
+            }).addTo(this.deliveryMap);
+
+            this.deliveryMarker.bindPopup('Punto de entrega').openPopup();
+
+            this.deliveryMarker.on('dragend', () => {
+                const position = this.deliveryMarker.getLatLng();
+
+                this.deliveryLat.set(position.lat);
+                this.deliveryLng.set(position.lng);
+            });
+        };
+
+        this.deliveryMap.on('click', (e: any) => {
+            setDeliveryPoint(e.latlng.lat, e.latlng.lng);
+        });
+
+        this.deliveryMap.locate({ setView: true, maxZoom: 15 });
+
+        this.deliveryMap.on('locationfound', (e: any) => {
+            setDeliveryPoint(e.latlng.lat, e.latlng.lng);
+        });
+
+        this.deliveryMap.on('locationerror', () => {
+            setDeliveryPoint(12.1364, -86.2514);
+        });
+
+        const zoomControl = L.control({ position: 'topleft' });
+
+        zoomControl.onAdd = () => {
+            const div = L.DomUtil.create('div');
+
+            div.innerHTML = `
+        <div style="
+          display:flex;
+          flex-direction:column;
+          gap:10px;
+        ">
+
+          <button id="zoom-in-btn"
+            style="
+              width:46px;
+              height:46px;
+              background:white;
+              border-radius:16px;
+              border:1px solid #e5e7eb;
+              box-shadow:0 12px 30px rgba(0,0,0,.18);
+              cursor:pointer;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-size:20px;
+              transition:all .2s ease;
+            ">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+              <path d="M11 8v6"></path>
+              <path d="M8 11h6"></path>
+            </svg>
+          </button>
+
+          <button id="zoom-out-btn"
+            style="
+              width:46px;
+              height:46px;
+              background:white;
+              border-radius:16px;
+              border:1px solid #e5e7eb;
+              box-shadow:0 12px 30px rgba(0,0,0,.18);
+              cursor:pointer;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-size:20px;
+              transition:all .2s ease;
+            ">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+              <path d="M8 11h6"></path>
+            </svg>
+          </button>
+
+        </div>
+      `;
+
+            L.DomEvent.disableClickPropagation(div);
+            L.DomEvent.disableScrollPropagation(div);
+
+            setTimeout(() => {
+                const zoomInBtn = div.querySelector('#zoom-in-btn') as HTMLElement | null;
+                const zoomOutBtn = div.querySelector('#zoom-out-btn') as HTMLElement | null;
+
+                zoomInBtn?.addEventListener('click', () => {
+                    this.deliveryMap.zoomIn();
+                });
+
+                zoomOutBtn?.addEventListener('click', () => {
+                    this.deliveryMap.zoomOut();
+                });
+
+                [zoomInBtn, zoomOutBtn].forEach(btn => {
+                    if (!btn) return;
+
+                    btn.addEventListener('mouseenter', () => {
+                        btn.style.transform = 'translateY(-2px)';
+                        btn.style.boxShadow = '0 16px 35px rgba(0,0,0,0.22)';
+                    });
+
+                    btn.addEventListener('mouseleave', () => {
+                        btn.style.transform = 'translateY(0)';
+                        btn.style.boxShadow = '0 12px 30px rgba(0,0,0,0.18)';
+                    });
+                });
+            });
+
+            return div;
+        };
+
+        zoomControl.addTo(this.deliveryMap);
+    }
+
+    // ==============================
+    // SIGNALS ENTREGA
+    // ==============================
+
+    readonly deliveryOpen = signal(false);
+
+    readonly deliveryDate = signal('');
+    readonly deliveryTime = signal('');
+
+    readonly deliveryLat = signal<number | null>(null);
+    readonly deliveryLng = signal<number | null>(null);
+
+    // ==============================
+    // MODAL ENTREGA
+    // ==============================
+
+    closeDelivery() {
+        this.deliveryOpen.set(false);
+
+        if (this.deliveryMap) {
+            this.deliveryMap.remove();
+            this.deliveryMap = null;
+            this.deliveryMarker = null;
+        }
+
+        this.unlockScroll();
+    }
+
+    continueToPayment() {
+        if (!this.isDeliveryValid()) return;
+
+        this.deliveryOpen.set(false);
+        this.openPayment();
+    }
+
+    isDeliveryValid(): boolean {
+        return (
+            !!this.deliveryDate() &&
+            !!this.deliveryTime() &&
+            this.deliveryLat() !== null &&
+            this.deliveryLng() !== null
+        );
+    }
 
     // ==============================
     // STORAGE
@@ -699,6 +1138,22 @@ export class Catalog implements AfterViewInit {
         "41": 0
     };
 
+    readonly selectedPaymentMethod = signal<'cash' | 'card' | null>(null);
+    readonly cashOrderConfirmed = signal(false);
+
+    selectPaymentMethod(method: 'cash' | 'card') {
+        this.selectedPaymentMethod.set(method);
+    }
+
+    confirmCashOrder() {
+        if (!this.isCashPaymentValid()) return;
+
+        this.saveCurrentOrder('cash');
+        this.cashOrderConfirmed.set(true);
+    }
+
+
+
     // ==============================
     // SIGNALS
     // ==============================
@@ -756,6 +1211,12 @@ export class Catalog implements AfterViewInit {
     // ==============================
 
     ngOnInit(): void {
+        const savedOrders = localStorage.getItem(this.ORDERS_STORAGE_KEY);
+
+        if (savedOrders) {
+            this.orders.set(JSON.parse(savedOrders));
+        }
+
         this.loadCart();
         this.loadSelectedColors();
 
@@ -918,10 +1379,13 @@ export class Catalog implements AfterViewInit {
             ]);
         }
 
+        this.setRandomRecommendation(product.id);
+
         this.closeDetail();
 
         setTimeout(() => {
-            this.openCart();
+            this.recommendationOpen.set(true);
+            this.lockScroll();
         }, 200);
 
         this.saveCart();
@@ -986,12 +1450,48 @@ export class Catalog implements AfterViewInit {
     // MODAL PAGO
     // ==============================
 
+    readonly cardOrderConfirmed = signal(false);
+
+    backToPaymentMethods() {
+        this.selectedPaymentMethod.set(null);
+        this.cashOrderConfirmed.set(false);
+        this.cardOrderConfirmed.set(false);
+
+
+    }
+
+    backToDelivery() {
+        this.paymentOpen.set(false);
+        this.deliveryOpen.set(true);
+
+        this.selectedPaymentMethod.set(null);
+        this.cashOrderConfirmed.set(false);
+        this.cardOrderConfirmed.set(false);
+
+        setTimeout(() => {
+            this.initDeliveryMap();
+        }, 100);
+    }
+
+    confirmCardOrder() {
+        if (!this.isPaymentValid()) return;
+
+        this.saveCurrentOrder('card');
+        this.cardOrderConfirmed.set(true);
+        this.showExitWarning.set(false);
+    }
+
     openPayment() {
         this.paymentOpen.set(true);
         this.lockScroll();
     }
 
     requestClosePayment() {
+        if (this.cashOrderConfirmed() || this.cardOrderConfirmed()) {
+            this.closePayment();
+            return;
+        }
+
         const hasData =
             this.cardNumber().trim() ||
             this.cardName().trim() ||
@@ -1008,7 +1508,11 @@ export class Catalog implements AfterViewInit {
 
     closePayment() {
         this.paymentOpen.set(false);
+
         this.showExitWarning.set(false);
+        this.cardOrderConfirmed.set(false);
+        this.cashOrderConfirmed.set(false);
+
         this.clearPaymentForm();
         this.unlockScroll();
     }
@@ -1027,6 +1531,54 @@ export class Catalog implements AfterViewInit {
         this.cardExpiry.set('');
         this.cardCvv.set('');
         this.cardFlipped.set(false);
+
+        this.selectedPaymentMethod.set(null);
+
+        this.cashOrderConfirmed.set(false);
+        this.cardOrderConfirmed.set(false);
+
+        this.cashCurrency.set(null);
+        this.cashBills.set([]);
+    }
+
+    readonly cashCurrency = signal<'cordobas' | 'dolares' | null>(null);
+    readonly cashBills = signal<number[]>([]);
+
+    readonly cordobaBills = [10, 20, 50, 100, 200, 500, 1000];
+    readonly dollarBills = [1, 5, 10, 20, 50, 100];
+
+    addCashBill(bill: number) {
+        this.cashBills.update(bills => [...bills, bill]);
+    }
+
+    removeLastCashBill() {
+        this.cashBills.update(bills => bills.slice(0, -1));
+    }
+
+    resetCashBills() {
+        this.cashBills.set([]);
+    }
+
+    cashBillsTotal(): number {
+        return this.cashBills().reduce((sum, bill) => sum + bill, 0);
+    }
+
+    cashBillCount(bill: number): number {
+        return this.cashBills().filter(b => b === bill).length;
+    }
+
+    getCashBillImage(bill: number): string {
+        const currency = this.cashCurrency() === 'cordobas' ? 'Cordobas' : 'Dolares';
+        return `Billetes/${currency}/${bill} ${currency}.jpg`;
+    }
+
+    isCashPaymentValid(): boolean {
+        return this.cashCurrency() !== null && this.cashBills().length > 0;
+    }
+
+    selectCashCurrency(currency: 'cordobas' | 'dolares') {
+        this.cashCurrency.set(currency);
+        this.cashBills.set([]);
     }
 
     // ==============================
