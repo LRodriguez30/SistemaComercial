@@ -478,26 +478,26 @@ export class Catalog implements AfterViewInit {
     }
 
     selectCoverageZone(zone: any) {
-    const lat =
-        zone.coordinates.reduce((sum: number, point: number[]) => sum + point[0], 0) /
-        zone.coordinates.length;
+        const lat =
+            zone.coordinates.reduce((sum: number, point: number[]) => sum + point[0], 0) /
+            zone.coordinates.length;
 
-    const lng =
-        zone.coordinates.reduce((sum: number, point: number[]) => sum + point[1], 0) /
-        zone.coordinates.length;
+        const lng =
+            zone.coordinates.reduce((sum: number, point: number[]) => sum + point[1], 0) /
+            zone.coordinates.length;
 
-    this.selectedDeliveryZone.set(zone);
-    this.deliveryLat.set(lat);
-    this.deliveryLng.set(lng);
+        this.selectedDeliveryZone.set(zone);
+        this.deliveryLat.set(lat);
+        this.deliveryLng.set(lng);
 
-    this.deliveryMap?.setView([lat, lng], 14);
+        this.deliveryMap?.setView([lat, lng], 14);
 
-    if (this.deliveryMarker) {
-        this.deliveryMarker.setLatLng([lat, lng]);
-    } else {
-        this.deliveryMarker = L.marker([lat, lng]).addTo(this.deliveryMap);
+        if (this.deliveryMarker) {
+            this.deliveryMarker.setLatLng([lat, lng]);
+        } else {
+            this.deliveryMarker = L.marker([lat, lng]).addTo(this.deliveryMap);
+        }
     }
-}
 
     private initDeliveryMap(): void {
         if (this.deliveryMap) {
@@ -529,8 +529,8 @@ export class Catalog implements AfterViewInit {
     `);
 
             polygon.on('click', (event: any) => {
-    setDeliveryPoint(event.latlng.lat, event.latlng.lng);
-});
+                setDeliveryPoint(event.latlng.lat, event.latlng.lng);
+            });
         });
 
         const deliveryIcon = L.divIcon({
@@ -733,24 +733,24 @@ export class Catalog implements AfterViewInit {
     }
 
     isDeliveryValid() {
-    if (!this.deliveryDate() || !this.deliveryTime()) return false;
+        if (!this.deliveryDate() || !this.deliveryTime()) return false;
 
-    if (this.deliveryMode() === 'pickup') {
-        return !!this.selectedPickupBranch();
+        if (this.deliveryMode() === 'pickup') {
+            return !!this.selectedPickupBranch();
+        }
+
+        return !!this.selectedDeliveryZone() && !!this.deliveryLat() && !!this.deliveryLng();
     }
 
-    return !!this.selectedDeliveryZone() && !!this.deliveryLat() && !!this.deliveryLng();
-}
+    readonly ordersModalOpen = signal(false);
 
-readonly ordersModalOpen = signal(false);
+    openOrdersModal() {
+        this.ordersModalOpen.set(true);
+    }
 
-openOrdersModal() {
-    this.ordersModalOpen.set(true);
-}
-
-closeOrdersModal() {
-    this.ordersModalOpen.set(false);
-}
+    closeOrdersModal() {
+        this.ordersModalOpen.set(false);
+    }
 
     // ==============================
     // STORAGE
@@ -1047,6 +1047,7 @@ closeOrdersModal() {
         new ProductModel(6, "Sport", {
             name: "Zapato Sport Pasos",
             description: "Pasos estilo Sport combina un diseño inspirado en el calzado deportivo con una estructura ligera y ventilada para brindar mayor comodidad durante el día.",
+            price: 280,
             image: "Catalogo/Modelos/Sport-Blanco con Botón Negro.png",
             colors: this.sportColors,
             category: "Zapatos",
