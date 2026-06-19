@@ -328,6 +328,137 @@
 
 </section>
 
+<!-- PROMOCIONES -->
+<section id="promotions" class="bg-white border-b border-zinc-200 reveal">
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-12 py-20">
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+      <!-- IMAGEN -->
+      <div class="reveal">
+        <div class="overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-zinc-100 shadow-sm">
+          <img ngSrc="Catalogo/Modelos/Clásica-Negro.png" width="900" height="900"
+            class="w-full aspect-square object-cover" alt="Promoción 2x1 en chinelas PASOS" />
+        </div>
+      </div>
+
+      <!-- CARD -->
+      <div
+        class="reveal reveal-delay-1 relative overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-zinc-50 p-8 lg:p-10 shadow-sm">
+
+        <!-- DECORACIÓN -->
+        <div class="absolute -top-24 -right-24 w-56 h-56 rounded-full bg-black/5"></div>
+        <div class="absolute -bottom-24 -left-24 w-56 h-56 rounded-full bg-black/5"></div>
+
+        <div class="relative">
+
+          <!-- CARTEL PROMO -->
+          <div class="relative overflow-hidden rounded-[2rem] bg-black text-white p-6 lg:p-8 shadow-2xl">
+
+            <div class="absolute inset-0 opacity-10">
+              <div
+                class="h-full w-full bg-[repeating-linear-gradient(135deg,white_0px,white_1px,transparent_1px,transparent_14px)]">
+              </div>
+            </div>
+
+            <div class="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+
+              <div>
+                <p class="text-xs uppercase tracking-[0.35em] text-zinc-300 font-bold">
+                  Promoción especial
+                </p>
+
+                <div class="flex items-end gap-3 mt-3">
+                  <span class="text-7xl lg:text-8xl font-black leading-none tracking-tighter">
+                    2
+                  </span>
+
+                  <span class="text-4xl lg:text-5xl font-black leading-none pb-2">
+                    x
+                  </span>
+
+                  <span class="text-7xl lg:text-8xl font-black leading-none tracking-tighter">
+                    1
+                  </span>
+                </div>
+              </div>
+
+              <div class="sm:text-right border-t sm:border-t-0 sm:border-l border-white/20 pt-5 sm:pt-0 sm:pl-6">
+                <p class="text-sm uppercase tracking-[0.25em] text-zinc-300 font-semibold">
+                  Por tiempo
+                </p>
+
+                <p class="text-3xl font-black mt-1 leading-none">
+                  limitado
+                </p>
+
+                <p class="text-xs text-zinc-400 mt-3">
+                  Hasta agotar existencias
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
+          <h2 class="text-4xl lg:text-5xl font-black mt-8 leading-tight">
+            Lleva dos pares y paga uno.
+          </h2>
+
+          <p class="text-zinc-600 text-lg leading-relaxed mt-6">
+            Promoción especial en modelos seleccionados de chinelas PASOS.
+            Disponible por tiempo limitado en el punto de venta.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+
+            <div class="rounded-2xl border border-zinc-200 bg-white p-5">
+              <p class="text-xs uppercase tracking-[0.2em] text-zinc-500 font-semibold">
+                Aplica en
+              </p>
+
+              <h3 class="text-2xl font-black mt-2">
+                Chinelas seleccionadas
+              </h3>
+            </div>
+
+            <div class="rounded-2xl border border-zinc-200 bg-white p-5">
+              <p class="text-xs uppercase tracking-[0.2em] text-zinc-500 font-semibold">
+                Disponible en
+              </p>
+
+              <h3 class="text-2xl font-black mt-2">
+                Mercado Oriental
+              </h3>
+            </div>
+
+          </div>
+
+          <div class="flex flex-wrap gap-4 mt-10">
+
+            <a routerLink="/catalog"
+              class="bg-black text-white px-7 py-4 rounded-2xl text-sm font-semibold hover:bg-zinc-800 transition cursor-pointer active:scale-95">
+              Ver modelos
+            </a>
+
+            <a (click)="scrollTo('location')"
+              class="border border-zinc-300 px-7 py-4 rounded-2xl text-sm font-semibold hover:bg-white transition cursor-pointer bg-zinc-50 active:scale-95">
+              Dónde comprar
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
 <!-- PUNTOS DE VENTA -->
 <section id="location" class="relative overflow-hidden text-white">
 
@@ -674,15 +805,21 @@
             </p>
 
             <div class="flex flex-wrap gap-3 mt-6">
-              <a
+              <a href="https://wa.me/505XXXXXXXX" target="_blank"
                 class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white text-black text-sm font-semibold transition active:scale-95 cursor-pointer">
-                <iconify-icon icon="lucide:message-circle"></iconify-icon>
+
+                <iconify-icon icon="ic:baseline-whatsapp" class="text-xl text-black">
+                </iconify-icon>
+
                 WhatsApp
               </a>
 
-              <a
+              <a href="https://www.facebook.com/share/1DrVq8eGr5/" target="_blank"
                 class="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-white/20 text-white text-sm font-semibold hover:bg-white/10 transition active:scale-95 cursor-pointer">
-                <iconify-icon icon="lucide:facebook"></iconify-icon>
+
+                <iconify-icon icon="ic:baseline-facebook" class="text-xl text-white">
+                </iconify-icon>
+
                 Facebook
               </a>
             </div>

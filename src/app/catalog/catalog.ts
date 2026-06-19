@@ -13,6 +13,8 @@ interface Product {
     image: string;
     tags: string[];
     colors: ProductColor[];
+    category: string;
+    available: boolean;
 }
 
 interface ProductColor {
@@ -26,8 +28,13 @@ interface CartItem {
     product: Product;
     size: string;
     quantity: number;
-    unitPrice: number;
     discount: number;
+    combo?: {
+        title: string;
+        tag: string;
+        oldPrice: number;
+        comboPrice: number;
+    };
 }
 
 interface SavedOrder {
@@ -44,24 +51,24 @@ interface SavedOrder {
         lng: number | null;
     };
     payment: {
-    method: 'cash' | 'card';
-    currency?: 'cordobas' | 'dolares' | null;
-    bills?: number[];
+        method: 'cash' | 'card';
+        currency?: 'cordobas' | 'dolares' | null;
+        bills?: number[];
 
-    cardName?: string;
-    cardNumber?: string;
-    cardExpiry?: string;
-};
+        cardName?: string;
+        cardNumber?: string;
+        cardExpiry?: string;
+    };
     status: OrderStatus;
     createdAt: string;
 }
 
 type OrderStatus =
-  | 'received'
-  | 'preparing'
-  | 'on_the_way'
-  | 'delivered'
-  | 'cancelled';
+    | 'received'
+    | 'preparing'
+    | 'on_the_way'
+    | 'delivered'
+    | 'cancelled';
 
 @Component({
     selector: 'app-catalog',
@@ -70,6 +77,12 @@ type OrderStatus =
     templateUrl: './catalog.html'
 })
 export class Catalog implements AfterViewInit {
+
+    cartBarOpen = signal(false);
+
+    toggleCartBar() {
+        this.cartBarOpen.update(value => !value);
+    }
 
     readonly recommendedProduct = signal<Product | null>(null);
     readonly recommendationOpen = signal(false);
@@ -101,109 +114,146 @@ export class Catalog implements AfterViewInit {
     }
 
     private setRandomRecommendation(currentProductId: number) {
-        const availableProducts = this.products().filter(p => p.id !== currentProductId);
+        const currentProduct = this.products().find(p => p.id === currentProductId);
 
-        if (availableProducts.length === 0) {
+        if (!currentProduct) {
             this.recommendedProduct.set(null);
             return;
         }
 
-        const randomIndex = Math.floor(Math.random() * availableProducts.length);
-        this.recommendedProduct.set(availableProducts[randomIndex]);
+        const cartModelIds = new Set(
+            this.cart().map(item => item.product.model)
+        );
+
+        const productsDifferentModel = this.products().filter(product =>
+            product.model !== currentProduct.model &&
+            product.available
+        );
+
+        const productsNotInCart = productsDifferentModel.filter(product =>
+            !cartModelIds.has(product.model)
+        );
+
+        const candidates = productsNotInCart.length > 0
+            ? productsNotInCart
+            : productsDifferentModel;
+
+        if (candidates.length === 0) {
+            this.recommendedProduct.set(null);
+            return;
+        }
+
+        const randomProduct = candidates[
+            Math.floor(Math.random() * candidates.length)
+        ];
+
+        const randomColor = randomProduct.colors.length > 0
+            ? randomProduct.colors[Math.floor(Math.random() * randomProduct.colors.length)]
+            : null;
+
+        const recommended = randomColor
+            ? {
+                ...randomProduct,
+                name: `${randomProduct.model} Pasos - ${randomColor.name}`,
+                image: `Catalogo/Modelos/${randomProduct.model}-${randomColor.name}.png`
+            }
+            : randomProduct;
+
+        this.recommendedProduct.set(recommended);
     }
 
     readonly lastOrder = signal<SavedOrder | null>(null);
     private readonly LAST_ORDER_STORAGE_KEY = 'pasos_last_order';
 
     readonly orders = signal<SavedOrder[]>([]);
-    
+
     readonly ordersExpanded = signal(false);
 
     private readonly ORDERS_STORAGE_KEY = 'pasos_orders';
 
     activeOrders = computed(() =>
-  this.orders().filter(order =>
-    order.status !== 'delivered' &&
-    order.status !== 'cancelled'
-  )
-);
+        this.orders().filter(order =>
+            order.status !== 'delivered' &&
+            order.status !== 'cancelled'
+        )
+    );
 
-orderStatusMessage(status: string): string {
-  const messages: Record<string, string> = {
-    received: 'Tu pedido fue recibido correctamente.',
-    preparing: 'Estamos preparando tu pedido.',
-    on_the_way: 'El repartidor ya va en camino.',
-    delivered: 'Tu pedido fue entregado correctamente.',
-    cancelled: 'Este pedido fue cancelado.',
-  };
+    orderStatusMessage(status: string): string {
+        const messages: Record<string, string> = {
+            received: 'Tu pedido fue recibido correctamente.',
+            preparing: 'Estamos preparando tu pedido.',
+            on_the_way: 'El repartidor ya va en camino.',
+            delivered: 'Tu pedido fue entregado correctamente.',
+            cancelled: 'Este pedido fue cancelado.',
+        };
 
-  return messages[status] ?? 'Tu pedido está en proceso.';
-}
+        return messages[status] ?? 'Tu pedido está en proceso.';
+    }
 
-askAboutOrder(order: any): void {
-  const phoneNumber = '50500000000';
+    askAboutOrder(order: any): void {
+        const phoneNumber = '50500000000';
 
-  const message = `Hola PASOS, quiero preguntar por mi pedido #${order.id.slice(0, 8)}. Estado actual: ${this.orderStatusLabel(order.status)}.`;
+        const message = `Hola PASOS, quiero preguntar por mi pedido #${order.id.slice(0, 8)}. Estado actual: ${this.orderStatusLabel(order.status)}.`;
 
-  window.open(
-    `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`,
-    '_blank'
-  );
-}
+        window.open(
+            `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`,
+            '_blank'
+        );
+    }
 
-orderProgress(status: string): number {
-  const progress: Record<string, number> = {
-    received: 25,
-    preparing: 50,
-    on_the_way: 75,
-    delivered: 100,
-    cancelled: 0,
-  };
+    orderProgress(status: string): number {
+        const progress: Record<string, number> = {
+            received: 25,
+            preparing: 50,
+            on_the_way: 75,
+            delivered: 100,
+            cancelled: 0,
+        };
 
-  return progress[status] ?? 25;
-}
+        return progress[status] ?? 25;
+    }
 
-orderStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    received: 'Pedido recibido',
-    preparing: 'En preparación',
-    on_the_way: 'Repartidor en camino',
-    delivered: 'Entregado',
-    cancelled: 'Cancelado',
-  };
+    orderStatusLabel(status: string): string {
+        const labels: Record<string, string> = {
+            received: 'Pedido recibido',
+            preparing: 'En preparación',
+            on_the_way: 'Repartidor en camino',
+            delivered: 'Entregado',
+            cancelled: 'Cancelado',
+        };
 
-  return labels[status] ?? 'Pedido en curso';
-}
+        return labels[status] ?? 'Pedido en curso';
+    }
 
-selectedOrder = signal<SavedOrder | null>(null);
+    selectedOrder = signal<SavedOrder | null>(null);
 
-openOrderDetail(order: any): void {
-  this.selectedOrder.set(order);
-}
+    openOrderDetail(order: any): void {
+        this.selectedOrder.set(order);
+    }
 
-closeOrderDetail(): void {
-  this.selectedOrder.set(null);
-}
+    closeOrderDetail(): void {
+        this.selectedOrder.set(null);
+    }
 
-orderSubtotal(order: SavedOrder | null): number {
-    return order?.subtotal ?? 0;
-}
+    orderSubtotal(order: SavedOrder | null): number {
+        return order?.subtotal ?? 0;
+    }
 
-orderTotalDiscount(order: SavedOrder | null): number {
-    return order?.discount ?? 0;
-}
+    orderTotalDiscount(order: SavedOrder | null): number {
+        return order?.discount ?? 0;
+    }
 
-orderCommission(order: SavedOrder | null): number {
-    return order?.commission ?? 0;
-}
+    orderCommission(order: SavedOrder | null): number {
+        return order?.commission ?? 0;
+    }
 
-orderCashBillsTotal(order: SavedOrder | null): number {
-    return order?.payment.bills?.reduce((sum, bill) => sum + bill, 0) ?? 0;
-}
+    orderCashBillsTotal(order: SavedOrder | null): number {
+        return order?.payment.bills?.reduce((sum, bill) => sum + bill, 0) ?? 0;
+    }
 
-orderCashBillCount(order: SavedOrder | null, bill: number): number {
-    return order?.payment.bills?.filter(b => b === bill).length ?? 0;
-}
+    orderCashBillCount(order: SavedOrder | null, bill: number): number {
+        return order?.payment.bills?.filter(b => b === bill).length ?? 0;
+    }
 
     private saveCurrentOrder(method: 'cash' | 'card') {
         const order: SavedOrder = {
@@ -220,15 +270,15 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
                 lng: this.deliveryLng()
             },
             payment: {
-    method,
+                method,
 
-    currency: method === 'cash' ? this.cashCurrency() : null,
-    bills: method === 'cash' ? [...this.cashBills()] : [],
+                currency: method === 'cash' ? this.cashCurrency() : null,
+                bills: method === 'cash' ? [...this.cashBills()] : [],
 
-    cardName: method === 'card' ? this.cardName() : '',
-    cardNumber: method === 'card' ? this.cardNumber() : '',
-    cardExpiry: method === 'card' ? this.cardExpiry() : '',
-},
+                cardName: method === 'card' ? this.cardName() : '',
+                cardNumber: method === 'card' ? this.cardNumber() : '',
+                cardExpiry: method === 'card' ? this.cardExpiry() : '',
+            },
             status: 'preparing',
             createdAt: new Date().toISOString()
         };
@@ -247,9 +297,171 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
         this.saveCart();
     }
 
+    readonly pickupBranches = [
+        {
+            name: 'Mercado Oriental',
+            description: 'Punto principal de retiro PASOS.',
+            address: 'Mercado Oriental, Managua',
+            time: 'Retiro coordinado según hora seleccionada'
+        },
+        {
+            name: 'Fábrica Nindirí',
+            description: 'Retiro directo en fábrica.',
+            address: 'Nindirí, Masaya',
+            time: 'Retiro según disponibilidad'
+        }
+    ];
+
+    readonly selectedPickupBranch = signal<any | null>(null);
+
+    selectPickupBranch(branch: any) {
+        this.selectedPickupBranch.set(branch);
+    }
+
+    readonly deliveryMode = signal<'delivery' | 'pickup'>('delivery');
+
+    readonly selectedDeliveryZone = signal<any | null>(null);
+
+    readonly deliveryZones = [
+        {
+            name: 'Managua Centro',
+            cost: 60,
+            time: '25 - 40 min',
+            color: '#111111',
+            coordinates: [
+                [12.1508, -86.2683],
+                [12.1508, -86.2450],
+                [12.1300, -86.2450],
+                [12.1300, -86.2683]
+            ]
+        },
+        {
+            name: 'Carretera Norte',
+            cost: 80,
+            time: '35 - 50 min',
+            color: '#52525b',
+            coordinates: [
+                [12.1650, -86.2400],
+                [12.1650, -86.2050],
+                [12.1350, -86.2050],
+                [12.1350, -86.2400]
+            ]
+        },
+        {
+            name: 'Mercado Oriental',
+            cost: 40,
+            time: '15 - 25 min',
+            color: '#18181b',
+            coordinates: [
+                [12.1520, -86.2540],
+                [12.1520, -86.2380],
+                [12.1390, -86.2380],
+                [12.1390, -86.2540]
+            ]
+        }
+    ];
+
+
+    selectDeliveryMode(mode: 'delivery' | 'pickup') {
+        this.deliveryMode.set(mode);
+
+        if (mode === 'pickup') {
+            this.selectedDeliveryZone.set(null);
+            this.deliveryLat.set(null);
+            this.deliveryLng.set(null);
+            return;
+        }
+
+        this.selectedPickupBranch.set(null);
+
+        setTimeout(() => {
+            this.deliveryMap?.invalidateSize();
+        }, 100);
+    }
+
+    private isPointInsidePolygon(
+        point: { lat: number; lng: number },
+        polygon: number[][]
+    ): boolean {
+        const x = point.lng;
+        const y = point.lat;
+
+        let inside = false;
+
+        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+            const xi = polygon[i][1];
+            const yi = polygon[i][0];
+            const xj = polygon[j][1];
+            const yj = polygon[j][0];
+
+            const intersect =
+                yi > y !== yj > y &&
+                x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+
+            if (intersect) inside = !inside;
+        }
+
+        return inside;
+    }
+
+    private getDeliveryZoneByPoint(lat: number, lng: number) {
+        return this.deliveryZones.find(zone =>
+            this.isPointInsidePolygon({ lat, lng }, zone.coordinates)
+        ) ?? null;
+    }
+
+
     toggleOrdersExpanded() {
         this.ordersExpanded.update(value => !value);
     }
+
+    readonly couponBoxOpen = signal(false);
+
+    toggleCouponBox() {
+        this.couponBoxOpen.update(value => !value);
+    }
+
+    removeCoupon() {
+
+        this.appliedCoupon.set(null);
+        this.promoCode.set('');
+    }
+    readonly promoCode = signal('');
+    readonly appliedCoupon = signal<any | null>(null);
+
+    readonly coupons = [
+        {
+            code: 'PASOS10',
+            label: '10% de descuento',
+            discountPercent: 10
+        },
+        {
+            code: '2X1PASOS',
+            label: 'Cupón especial 2x1',
+            discountPercent: 15
+        }
+    ];
+
+    applyCoupon() {
+        const code = this.promoCode().trim().toUpperCase();
+
+        const coupon = this.coupons.find(c => c.code === code);
+
+        if (!coupon) {
+            this.appliedCoupon.set(null);
+            return;
+        }
+
+        this.appliedCoupon.set(coupon);
+    }
+
+    readonly couponDiscount = computed(() => {
+        const coupon = this.appliedCoupon();
+
+        if (!coupon) return 0;
+
+        return this.subtotal() * (coupon.discountPercent / 100);
+    });
 
     private deliveryMap: any;
     private deliveryMarker: any;
@@ -257,12 +469,35 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
     openDelivery() {
         this.cartOpen.set(false);
         this.deliveryOpen.set(true);
+        this.deliveryActionOpen.set(false);
         this.lockScroll();
 
         setTimeout(() => {
             this.initDeliveryMap();
         }, 100);
     }
+
+    selectCoverageZone(zone: any) {
+    const lat =
+        zone.coordinates.reduce((sum: number, point: number[]) => sum + point[0], 0) /
+        zone.coordinates.length;
+
+    const lng =
+        zone.coordinates.reduce((sum: number, point: number[]) => sum + point[1], 0) /
+        zone.coordinates.length;
+
+    this.selectedDeliveryZone.set(zone);
+    this.deliveryLat.set(lat);
+    this.deliveryLng.set(lng);
+
+    this.deliveryMap?.setView([lat, lng], 14);
+
+    if (this.deliveryMarker) {
+        this.deliveryMarker.setLatLng([lat, lng]);
+    } else {
+        this.deliveryMarker = L.marker([lat, lng]).addTo(this.deliveryMap);
+    }
+}
 
     private initDeliveryMap(): void {
         if (this.deliveryMap) {
@@ -278,6 +513,25 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(this.deliveryMap);
+
+        this.deliveryZones.forEach(zone => {
+            const polygon = L.polygon(zone.coordinates as any, {
+                color: zone.color,
+                weight: 2,
+                fillColor: zone.color,
+                fillOpacity: 0.18
+            }).addTo(this.deliveryMap);
+
+            polygon.bindPopup(`
+        <strong>${zone.name}</strong><br>
+        Envío: C$${zone.cost}<br>
+        Tiempo: ${zone.time}
+    `);
+
+            polygon.on('click', (event: any) => {
+    setDeliveryPoint(event.latlng.lat, event.latlng.lng);
+});
+        });
 
         const deliveryIcon = L.divIcon({
             className: '',
@@ -299,6 +553,9 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
             this.deliveryLat.set(lat);
             this.deliveryLng.set(lng);
 
+            const zone = this.getDeliveryZoneByPoint(lat, lng);
+            this.selectedDeliveryZone.set(zone);
+
             if (this.deliveryMarker) {
                 this.deliveryMarker.setLatLng([lat, lng]);
                 return;
@@ -316,6 +573,9 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
 
                 this.deliveryLat.set(position.lat);
                 this.deliveryLng.set(position.lng);
+
+                const draggedZone = this.getDeliveryZoneByPoint(position.lat, position.lng);
+                this.selectedDeliveryZone.set(draggedZone);
             });
         };
 
@@ -466,14 +726,31 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
         this.openPayment();
     }
 
-    isDeliveryValid(): boolean {
-        return (
-            !!this.deliveryDate() &&
-            !!this.deliveryTime() &&
-            this.deliveryLat() !== null &&
-            this.deliveryLng() !== null
-        );
+    readonly deliveryActionOpen = signal(false);
+
+    toggleDeliveryAction() {
+        this.deliveryActionOpen.update(value => !value);
     }
+
+    isDeliveryValid() {
+    if (!this.deliveryDate() || !this.deliveryTime()) return false;
+
+    if (this.deliveryMode() === 'pickup') {
+        return !!this.selectedPickupBranch();
+    }
+
+    return !!this.selectedDeliveryZone() && !!this.deliveryLat() && !!this.deliveryLng();
+}
+
+readonly ordersModalOpen = signal(false);
+
+openOrdersModal() {
+    this.ordersModalOpen.set(true);
+}
+
+closeOrdersModal() {
+    this.ordersModalOpen.set(false);
+}
 
     // ==============================
     // STORAGE
@@ -642,6 +919,11 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
             hex: "#1E3A8A"
         },
         {
+            name: "Verde con Negro",
+            hex: "#6D7350",
+            secondaryHex: "#000000"
+        },
+        {
             name: "Gris con Negro",
             hex: "#9CA3AF",
             secondaryHex: "#000000"
@@ -722,41 +1004,53 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
             description: "Pasos estilo Crocs combina ligereza y comodidad para largas jornadas. Recomendado para personal de salud, trabajo, descanso y uso diario.",
             price: 220,
             image: "Catalogo/Modelos/Crocs-Gris.png",
-            colors: this.crocsColors
+            colors: this.crocsColors,
+            category: "Crocs",
+            available: true
         }),
         new ProductModel(2, "Bayaband", {
             name: "Crocs Bayaband Pasos",
             description: "Pasos estilo Bayaband ofrece una apariencia deportiva y moderna. Ideal para uso diario",
             price: 250,
             image: "Catalogo/Modelos/Bayaband-Azul.png",
-            colors: this.bayabandColors
+            colors: this.bayabandColors,
+            category: "Crocs",
+            available: true
         }),
         new ProductModel(3, "Chinela Deportiva 23", {
             name: "Chinela Deportiva 23 Pasos",
             description: "Pasos deportivas ofrece comodidad y un diseño deportivo para quienes buscan un estilo relajado en su día a día.",
             price: 180,
             image: "Catalogo/Modelos/Chinela Deportiva 23-Blanco con Negro.png",
-            colors: this.chinelaDeportivaColors
+            colors: this.chinelaDeportivaColors,
+            category: "Slides",
+            available: true
         }),
         new ProductModel(4, "Urban 23", {
             name: "Chinela Urban 23 Pasos",
             description: "Pasos Urban 23 ofrece un diseño fresco y juvenil, pensado para quienes valoran tanto la comodidad como la personalidad en su calzado.",
             price: 180,
             image: "Catalogo/Modelos/Urban 23-Negro con Rosado.png",
-            colors: this.urbanColors
+            colors: this.urbanColors,
+            category: "Slides",
+            available: true
         }),
         new ProductModel(5, "Clásica", {
             name: "Chinelas Clásicas Pasos",
             description: "Pasos mantiene el encanto de las chinelas clásicas, añadiendo detalles y acabados que le dan un aspecto más distintivo y elegante.",
             price: 250,
             image: "Catalogo/Modelos/Clásica-Negro.png",
-            colors: this.classicColors
+            colors: this.classicColors,
+            category: "Slides",
+            available: true
         }),
         new ProductModel(6, "Sport", {
             name: "Zapato Sport Pasos",
             description: "Pasos estilo Sport combina un diseño inspirado en el calzado deportivo con una estructura ligera y ventilada para brindar mayor comodidad durante el día.",
             image: "Catalogo/Modelos/Sport-Blanco con Botón Negro.png",
-            colors: this.sportColors
+            colors: this.sportColors,
+            category: "Zapatos",
+            available: true
         })
     ]);
 
@@ -1193,8 +1487,68 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
     );
 
     readonly total = computed(() =>
-        this.subtotal() - this.totalDiscount() + this.comision()
+        this.subtotal()
+        - this.totalDiscount()
+        - this.couponDiscount()
+        + this.comision()
     );
+
+    readonly combos = [
+        {
+            title: 'Combo Familiar',
+            description: 'Lleva 3 pares seleccionados para uso diario.',
+            price: 600,
+            oldPrice: 750,
+            tag: 'Ahorro especial',
+            image: 'Catalogo/Modelos/Clásica-Negro.png'
+        },
+        {
+            title: 'Dúo Francia',
+            description: 'Dos pares con estilo deportivo inspirado en los colores de Francia. Ideal para compartir, regalar o vivir la temporada mundialista con comodidad.',
+            price: 420,
+            oldPrice: 500,
+            tag: 'Promo Mundial de Fútbol 2026',
+            image: 'Catalogo/Modelos/Bayaband-Azul con rayas Blancas y Rojas.png'
+        }
+    ];
+
+    readonly bestSellerModels = [
+        {
+            model: 'Sport',
+            image: 'Catalogo/Modelos/Sport-Negro con Botón Blanco.png'
+        },
+        {
+            model: 'Bayaband',
+            image: 'Catalogo/Modelos/Bayaband-Azul con rayas Blancas y Rojas.png'
+        },
+        {
+            model: 'Clásica',
+            image: 'Catalogo/Modelos/Clásica-Verde con Negro.png'
+        },
+    ];
+
+    readonly bestSellers = computed(() =>
+        this.bestSellerModels
+            .map(best => {
+                const product = this.products().find(p =>
+                    p.model === best.model && p.available
+                );
+
+                if (!product) return null;
+
+                return {
+                    ...product,
+                    image: best.image
+                };
+            })
+            .filter((p): p is ProductModel => !!p)
+    );
+
+    readonly cartActionOpen = signal(false);
+
+    toggleCartAction() {
+        this.cartActionOpen.update(value => !value);
+    }
 
     readonly cartTotal = computed(() =>
         this.cart().reduce((total, item) => {
@@ -1343,6 +1697,40 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
     // ACCIONES DEL CARRITO
     // ==============================
 
+    addComboToCart(combo: any) {
+        const comboProduct = {
+            id: Date.now(),
+            name: combo.title,
+            description: combo.description,
+            price: combo.price,
+            image: combo.image,
+            tags: [combo.tag, 'Combo especial'],
+            colors: [],
+            model: 'Combo',
+            category: 'Combo',
+            available: true
+        } as Product;
+
+        this.cart.update(items => [
+            ...items,
+            {
+                product: comboProduct,
+                size: 'Combo',
+                quantity: 1,
+                discount: combo.oldPrice - combo.price,
+                combo: {
+                    title: combo.title,
+                    tag: combo.tag,
+                    oldPrice: combo.oldPrice,
+                    comboPrice: combo.price
+                }
+            }
+        ]);
+
+        this.saveCart();
+        this.openCart();
+    }
+
     addToCart() {
         const product = this.selectedProduct();
         const size = this.selectedSize();
@@ -1373,7 +1761,6 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
                     product,
                     size,
                     quantity: 1,
-                    unitPrice,
                     discount
                 }
             ]);
@@ -1384,10 +1771,37 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
         this.closeDetail();
 
         setTimeout(() => {
+            this.cartBarOpen.set(false);
             this.recommendationOpen.set(true);
             this.lockScroll();
         }, 200);
 
+        this.saveCart();
+    }
+
+    changeCartItemSize(index: number, newSize: string) {
+        const item = this.cart()[index];
+        if (!item) return;
+
+        const newDiscount = this.sizeDiscounts[newSize] ?? 0;
+
+        this.cart.update(items => {
+            const updated = [...items];
+
+            updated[index] = {
+                ...updated[index],
+                size: newSize,
+                discount: newDiscount
+            };
+
+            return updated;
+        });
+
+        this.saveCart();
+    }
+
+    clearCart() {
+        this.cart.set([]);
         this.saveCart();
     }
 
@@ -1463,6 +1877,7 @@ orderCashBillCount(order: SavedOrder | null, bill: number): number {
     backToDelivery() {
         this.paymentOpen.set(false);
         this.deliveryOpen.set(true);
+        this.deliveryActionOpen.set(false);
 
         this.selectedPaymentMethod.set(null);
         this.cashOrderConfirmed.set(false);

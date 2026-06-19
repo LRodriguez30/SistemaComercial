@@ -5,6 +5,8 @@ import { NotFoundComponent } from './not-found/not-found.component';
 import { Branch } from './branch/branch';
 import { About } from './about/about';
 import { FAQ } from './faq/faq';
+import { Policy } from './policy/policy';
+import { Contact } from './contact/contact';
 
 export const routes: Routes = [
     {
@@ -34,9 +36,19 @@ export const routes: Routes = [
         component: FAQ
     },
     {
+        path: 'policy',
+        title: "Políticas | Pasos",
+        component: Policy
+    },
+    {
         path: 'about',
         title: "Acerca de Nosotros | Pasos",
         component: About
+    },
+    {
+        path: 'contact',
+        title: "Contacto | Pasos",
+        component: Contact
     },
     {
         path: '**',

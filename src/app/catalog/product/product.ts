@@ -7,6 +7,9 @@ export class ProductModel implements IProduct {
     tags: string[];
     colors: IProductColor[];
 
+    category: string;
+    available: boolean;
+
     model: string;
 
     constructor(
@@ -23,6 +26,9 @@ export class ProductModel implements IProduct {
         this.image = options?.image ?? "Not Found.png";
         this.tags = options?.tags ?? ["Comodidad", "Originalidad"];
         this.colors = options?.colors ?? [];
+
+        this.category = options?.category ?? "Chinelas";
+        this.available = options?.available ?? true;
     }
 }
 
@@ -35,6 +41,8 @@ interface IProduct {
     image: string;
     tags: string[];
     colors: IProductColor[];
+    category: string;
+    available: boolean;
 }
 
 interface IProductColor {
