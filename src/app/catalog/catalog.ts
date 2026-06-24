@@ -804,20 +804,12 @@ export class Catalog implements AfterViewInit {
             hex: "#166534"
         },
         {
-            name: "Amarillo",
-            hex: "#FACC15"
-        },
-        {
             name: "Naranja",
             hex: "#F97316"
         },
         {
             name: "Rojo",
             hex: "#DC2626"
-        },
-        {
-            name: "Violeta",
-            hex: "#7C3AED"
         },
         {
             name: "Marrón",
@@ -828,20 +820,8 @@ export class Catalog implements AfterViewInit {
             hex: "#D6C6A8"
         },
         {
-            name: "Crema",
-            hex: "#F5F5DC"
-        },
-        {
             name: "Turquesa",
             hex: "#14B8A6"
-        },
-        {
-            name: "Oliva",
-            hex: "#556B2F"
-        },
-        {
-            name: "Coral",
-            hex: "#FF7F50"
         }
     ];
 
